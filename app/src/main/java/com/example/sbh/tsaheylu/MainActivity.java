@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.clover_studio.spikachatmodule.ChatActivity;
@@ -26,23 +27,23 @@ import com.clover_studio.spikachatmodule.utils.Const;
 import com.clover_studio.spikachatmodule.utils.Tools;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private EditText mUserName;
     private EditText mRoomName;
-    private Button mEnterToChatRoom;
-    private boolean mWritePermission = false;
-    private boolean mPhoneStateReadPermission = false;
+    private ImageButton mEnterToChatRoom;
+    private boolean mNecessaryPermissionsGranted = false;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case Const.PermissionCode.READ_PHONE_STATE_AND_WRITE_STORAGE: {
+            case Const.PermissionCode.NECESSARY_PERMISSIONS: {
                 if (grantResults.length > 0 && Tools.checkGrantResults(grantResults)) {
-                    mPhoneStateReadPermission = true;
-                    mWritePermission = true;
+                    mNecessaryPermissionsGranted = true;
                 }
             }
         }
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mRoomName = (EditText)findViewById(R.id.roomname);
 
-        mEnterToChatRoom = (Button)findViewById(R.id.enter);
+        mEnterToChatRoom = (ImageButton)findViewById(R.id.enter);
 
         mEnterToChatRoom.setOnClickListener(this);
 
@@ -69,25 +70,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void requestNecessaryPermission()
     {
         // write permission
-        String[] reqpermissions = new String[2];
-        int pointer = 0;
+        String[] reqpermissions;
+        //int pointer = 0;
+        List<String> rawperms = new ArrayList<String>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            reqpermissions[pointer++] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            rawperms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        // for device id
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            rawperms.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        // for internet
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            rawperms.add(Manifest.permission.INTERNET);
+        }
+        // for camera
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            rawperms.add(Manifest.permission.CAMERA);
+        }
+        if(rawperms.size() > 0)
+        {
+            reqpermissions = rawperms.toArray(new String[0]);
+            ActivityCompat.requestPermissions(this, reqpermissions, Const.PermissionCode.NECESSARY_PERMISSIONS);
         }
         else
         {
-            mWritePermission = true;
-        }
-        // for device id
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            reqpermissions[pointer++] = Manifest.permission.READ_PHONE_STATE;
-        } else {
-            mPhoneStateReadPermission = true;
-        }
-        if(pointer > 0)
-        {
-            ActivityCompat.requestPermissions(this, reqpermissions, Const.PermissionCode.READ_PHONE_STATE_AND_WRITE_STORAGE);
+            mNecessaryPermissionsGranted = true;
         }
     }
     public static String getDeviceUUID(final Context context) {
@@ -141,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         if(view.getId() == R.id.enter)
         {
-            if(mWritePermission && mPhoneStateReadPermission)
+            if(mNecessaryPermissionsGranted)
             {
                 tryToLogin();
             }

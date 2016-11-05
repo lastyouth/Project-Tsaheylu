@@ -25,10 +25,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,10 +52,13 @@ import com.clover_studio.spikachatmodule.dialogs.PreviewMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewPhotoDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewVideoDialog;
 import com.clover_studio.spikachatmodule.dialogs.UploadFileDialog;
+import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
+import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManagerListener;
 import com.clover_studio.spikachatmodule.models.Attributes;
 import com.clover_studio.spikachatmodule.models.Config;
+import com.clover_studio.spikachatmodule.models.FacialEmotionModel;
 import com.clover_studio.spikachatmodule.models.GetMessagesModel;
 import com.clover_studio.spikachatmodule.models.GetStickersData;
 import com.clover_studio.spikachatmodule.models.Login;
@@ -117,11 +123,17 @@ public class ChatActivity extends BaseActivity {
     private StickersType stickersType = StickersType.CLOSED;
     private TypingType typingType = TypingType.BLANK;
     private TextView newMessagesButton;
+    private LinearLayout mEmotionTransferInterface;
 
     protected MenuManager menuManager;
     protected StickersManager stickersManager;
     protected List<String> sentMessages = new ArrayList<>();
     protected List<User> typingUsers = new ArrayList<>();
+
+    // sbh : for test, below imagebuttons may be managed by inflater
+    private ImageButton mEmoticonCandidate;
+    private ImageButton mFireworkCandidate;
+    private ImageButton mVibrationCandidate;
 
     //data from last paging
     protected List<Message> lastDataFromServer = new ArrayList<>();
@@ -153,6 +165,42 @@ public class ChatActivity extends BaseActivity {
     public enum TypingType {
         TYPING, BLANK;
     }
+
+    // callback for FacialEmotionManager
+    FacialEmotionManagerListener mFEMListener = new FacialEmotionManagerListener() {
+        @Override
+        public void facialEmotionRecognitionFinished(final FacialEmotionModel m, boolean success) {
+
+            if(success) {
+                Log.d(Const.TAG,"ChatActivity : Succeeded to receive result");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Pair<Double, String> baseResult = m.getScores().getBestScoredEmotion();
+
+                        String emotion = baseResult.second;
+
+                        if (emotion.equals("happiness")) {
+                            btnEmotion.setImageResource(R.drawable.ic_happy);
+                        } else if (emotion.equals("surprise")) {
+                            btnEmotion.setImageResource(R.drawable.ic_surprise);
+                        } else if (emotion.equals("angry")) {
+                            btnEmotion.setImageResource(R.drawable.ic_angry);
+                        } else if(emotion.equals("sadness"))
+                        {
+                            btnEmotion.setImageResource(R.drawable.ic_sad);
+                        }else if (emotion.equals("neutral")) {
+                            btnEmotion.setImageResource(R.drawable.ic_shy);
+                        }
+                    }
+                });
+            }
+            else
+            {
+                Log.e(Const.TAG,"ChatActivity : Something wrong! discard this data");
+            }
+        }
+    };
 
     /**
      * start chat activity with user data
@@ -245,13 +293,87 @@ public class ChatActivity extends BaseActivity {
             }
         });
 
+
+
         //sbh
+        mEmotionTransferInterface = (LinearLayout)findViewById(R.id.candidates);
         btnEmotion = (ImageButton)findViewById(R.id.btnEmotion);
+        /*btnEmotion.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    mEmotionTransferInterface.setVisibility(View.VISIBLE);
+
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    mEmotionTransferInterface.setVisibility(View.GONE);
+                }else if(event.getAction() == MotionEvent.ACTION_MOVE)
+                {
+                    int cx,cy;
+                    cx = (int)event.getRawX();
+                    cy = (int)event.getRawY();
+
+                    int tx1,ty1,tx2,ty2;
+                    tx1 = mEmoticonCandidate.getLeft();
+                    tx2 = mEmoticonCandidate.getRight();
+                    ty1 = mEmoticonCandidate.getTop();
+                    ty2 = mEmoticonCandidate.getBottom();
+
+                    if(Tools.pointInside(cx,cy,tx1,tx2,ty1,ty2))
+                    {
+                        Log.d(Const.TAG,"EmotionCandidate is detected");
+                    }
+                }
+                return false;
+            }
+        });*/
         btnEmotion.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
+                if(mEmotionTransferInterface.getVisibility() == View.GONE) {
+                    mEmotionTransferInterface.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    mEmotionTransferInterface.setVisibility(View.GONE);
+                }
+            }
+        });
 
+        // tast for candidates
+        mEmoticonCandidate = (ImageButton)findViewById(R.id.candidate_1);
+        mFireworkCandidate = (ImageButton)findViewById(R.id.candidate_2);
+        mVibrationCandidate = (ImageButton)findViewById(R.id.candidate_3);
+
+        mEmoticonCandidate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(Const.TAG, "onTouch of mEmoticonCandidate : " + event.toString());
+                return false;
+            }
+        });
+        mEmoticonCandidate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Const.TAG, "onClick of mEmoticonCandidate");
+                mEmotionTransferInterface.setVisibility(View.GONE);
+            }
+        });
+
+        mFireworkCandidate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Const.TAG,"onClick of mFireworkCandidate");
+                mEmotionTransferInterface.setVisibility(View.GONE);
+            }
+        });
+
+        mVibrationCandidate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Const.TAG,"onClick of mVibrationCandidate");
+                mEmotionTransferInterface.setVisibility(View.GONE);
             }
         });
 
@@ -329,6 +451,8 @@ public class ChatActivity extends BaseActivity {
         intentFilter.addAction(ApplicationStateManager.APPLICATION_RESUMED);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverImplementation, intentFilter);
 
+        // initialize FacialManaer
+        FacialEmotionManager.getInstance().initializeFacialManager(mFEMListener);
     }
 
     @Override
@@ -360,7 +484,7 @@ public class ChatActivity extends BaseActivity {
             pausedForSocket = false;
         }
         forceStaySocket = false;
-
+        FacialEmotionManager.getInstance().initializeTimer(FacialEmotionManager.DEFAULT_INTERVAL);
     }
 
     @Override
@@ -369,6 +493,7 @@ public class ChatActivity extends BaseActivity {
             SocketManager.getInstance().closeAndDisconnectSocket();
             pausedForSocket = true;
         }
+        FacialEmotionManager.getInstance().releaseTimer();
         super.onPause();
     }
 
@@ -376,6 +501,10 @@ public class ChatActivity extends BaseActivity {
     protected void onDestroy() {
         SocketManager.getInstance().closeAndDisconnectSocket();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiverImplementation);
+        if(FacialEmotionManager.getInstance().isInitialized())
+        {
+            FacialEmotionManager.getInstance().releaseFacialManager();
+        }
         super.onDestroy();
     }
 

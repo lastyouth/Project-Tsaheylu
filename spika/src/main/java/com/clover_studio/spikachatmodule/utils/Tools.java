@@ -87,6 +87,10 @@ public class Tools {
         String date = DateFormat.format(format, cal).toString();
         return date;
     }
+    //sbh for drag detection
+    public static boolean pointInside(int x, int y, int x1, int x2, int y1, int y2) {
+        return (x <= x2 && x >= x1 && y <= y2 && y >= y1);
+    }
 
     /**
      * get image path from uri

@@ -67,13 +67,14 @@
             android:layout_gravity="center"/>
 
     </LinearLayout>
-    <Button
+    <ImageButton
         android:id="@+id/enter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp"
-        android:text="Enter!"
-        android:textSize="20dp"/>
+        android:src="@drawable/ic_toruk"
+        android:background="@color/white_trans"
+        />
 </RelativeLayout>

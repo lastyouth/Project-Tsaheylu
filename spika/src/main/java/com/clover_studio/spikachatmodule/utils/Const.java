@@ -174,7 +174,7 @@ public class Const {
         public static final int LOCATION_THEIR = 3;
         public static final int LOCATION_MY = 4;
         public static final int READ_CONTACTS = 5;
-        public static final int READ_PHONE_STATE_AND_WRITE_STORAGE = 6;
+        public static final int NECESSARY_PERMISSIONS = 6;
     }
 
     public static final class ErrorCodes{
