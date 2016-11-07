@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clover_studio.spikachatmodule.adapters.MessageRecyclerViewAdapter;
 import com.clover_studio.spikachatmodule.adapters.SettingsAdapter;
@@ -133,7 +134,10 @@ public class ChatActivity extends BaseActivity {
     // sbh : for test, below imagebuttons may be managed by inflater
     private ImageButton mEmoticonCandidate;
     private ImageButton mFireworkCandidate;
-    private ImageButton mVibrationCandidate;
+    private ImageButton mVibrationCandidate = null;
+
+    // for loaded stickers
+    private GetStickersData mLoadedStickersData;
 
     //data from last paging
     protected List<Message> lastDataFromServer = new ArrayList<>();
@@ -607,6 +611,15 @@ public class ChatActivity extends BaseActivity {
             if (position == 0) {
                 forceStaySocket = true;
                 UsersInChatActivity.starUsersInChatActivity(getActivity(), activeUser.roomID);
+            }
+            // sbh added
+            else if(position == 1)
+            {
+                //forceStaySocket = true;
+                Toast.makeText(getApplicationContext(),"Stickers activity will be activated",Toast.LENGTH_SHORT).show();
+                ArrayList<Sticker> m = new ArrayList<Sticker>(mLoadedStickersData.data.stickers.get(0).list);
+
+                StickerClassificationActivity.startStickerClassificationActivity(getActivity(),m);
             }
             hideSettings();
         }
@@ -1790,7 +1803,8 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onCustomSuccess(Call<GetStickersData> call, Response<GetStickersData> response) {
                 super.onCustomSuccess(call, response);
-                stickersManager.setStickers(response.body(), getSupportFragmentManager());
+                mLoadedStickersData = response.body();
+                stickersManager.setStickers(mLoadedStickersData, getSupportFragmentManager());
             }
 
         });

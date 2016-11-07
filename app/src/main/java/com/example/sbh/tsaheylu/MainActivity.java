@@ -141,9 +141,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         user.name = username;
 
         Config config = new Config();
-        config.apiBaseUrl = "http://143.248.55.190:8080/spika/v1/";
+        //config.apiBaseUrl = "http://143.248.55.190:8080/spika/v1/";
         //config.apiBaseUrl = "";
-        config.socketUrl = "http://143.248.55.190:8080/spika";
+        //config.socketUrl = "http://143.248.55.190:8080/spika";
+        config.apiBaseUrl = "http://moonlightchaser.mooo.com:18888/spika/v1/";
+        config.socketUrl = "http://moonlightchaser.mooo.com:18888/spika";
 
         ChatActivity.startChatActivityWithConfig(this,user,config);
     }
