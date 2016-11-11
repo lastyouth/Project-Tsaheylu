@@ -6,6 +6,8 @@ package com.clover_studio.spikachatmodule.utils;
 public class Const {
 
     public static final String TAG = "Tsaheylu";
+
+
     public static final class Api{
 //        public static final String BASE_URL = "http://192.168.1.126:8080/v1/"; //test url
 //        public static final String BASE_URL = "http://52.91.91.133/spika/v1/"; //production url
@@ -43,6 +45,8 @@ public class Const {
         public static final String BASE_URL = "BASE_URL";
         public static final String STICKERS_COUNT = "STICKERS_COUNT7";
         public static final String CACHED_DEVICE_ID ="DEVICE_ID";
+        // sbh
+        public static final String STICKERS_CLASSIFICATION ="STICKERS_CLASSIFICATION";
     }
 
     public static final class Params{
@@ -206,5 +210,14 @@ public class Const {
         public static final int ERROR_CODE_SOCKET_TYPING_FAILED = 1000024;
         public static final int ERROR_CODE_SOCKET_LOGIN_NO_USER_ID = 1000025;
         public static final int ERROR_CODE_SOCKET_LOGIN_NO_ROOM_ID = 1000026;
+    }
+    public static final class Emotion
+    {
+        static public final int EMOTION_HAPPINESS = 0x00;
+        static public final int EMOTION_SADNESS = 0x01;
+        static public final int EMOTION_ANGRY = 0x02;
+        static public final int EMOTION_SURPRISE = 0x03;
+        static public final int EMOTION_NEUTRAL = 0x04;
+        public static final int MAX_QUEUED_DATA_FOR_HRV = 10;
     }
 }

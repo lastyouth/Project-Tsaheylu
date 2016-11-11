@@ -11,6 +11,7 @@ import com.clover_studio.spikachatmodule.adapters.StickerClassificationRecyclerV
 import com.clover_studio.spikachatmodule.base.BaseActivity;
 import com.clover_studio.spikachatmodule.models.Sticker;
 import com.clover_studio.spikachatmodule.utils.Const;
+import com.clover_studio.spikachatmodule.view.CustomTextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,12 @@ public class StickerClassificationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_sticker_classification);
+
+        setToolbar(R.id.tToolbar, R.layout.custom_users_in_chat_toolbar);
+        setMenuLikeBack();
+
+        CustomTextView ctv = (CustomTextView)findViewById(R.id.toolbarTitle);
+        ctv.setText("Sticker Classification");
 
         mStickerClassificationMain = (RecyclerView)findViewById(R.id.stickersInfoMain);
 

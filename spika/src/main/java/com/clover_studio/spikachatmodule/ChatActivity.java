@@ -53,12 +53,15 @@ import com.clover_studio.spikachatmodule.dialogs.PreviewMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewPhotoDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewVideoDialog;
 import com.clover_studio.spikachatmodule.dialogs.UploadFileDialog;
+import com.clover_studio.spikachatmodule.emotion.EmoticonSuggestionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
+import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManagerListener;
 import com.clover_studio.spikachatmodule.models.Attributes;
 import com.clover_studio.spikachatmodule.models.Config;
+import com.clover_studio.spikachatmodule.models.EstimatedEmotionModel;
 import com.clover_studio.spikachatmodule.models.FacialEmotionModel;
 import com.clover_studio.spikachatmodule.models.GetMessagesModel;
 import com.clover_studio.spikachatmodule.models.GetStickersData;
@@ -136,6 +139,15 @@ public class ChatActivity extends BaseActivity {
     private ImageButton mFireworkCandidate;
     private ImageButton mVibrationCandidate = null;
 
+    // sbh : stickerset for auto suggestion
+    private List<Sticker> mStickerSet;
+
+    // sbh : check bluetooth
+    private HeartSensorManager mHSManager;
+
+    // sbh : recent emotion
+    static private EstimatedEmotionModel mRecentEmotion = new EstimatedEmotionModel();
+
     // for loaded stickers
     private GetStickersData mLoadedStickersData;
 
@@ -155,6 +167,7 @@ public class ChatActivity extends BaseActivity {
     //message queue for unsent message when socket is not connected
     private List<Message> unSentMessageList = new ArrayList<>();
 
+
     //message queue for new message from latest api when listView is not at bottom
     private List<Message> unReadMessage = new ArrayList<>();
 
@@ -171,7 +184,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     // callback for FacialEmotionManager
-    FacialEmotionManagerListener mFEMListener = new FacialEmotionManagerListener() {
+    private FacialEmotionManagerListener mFEMListener = new FacialEmotionManagerListener() {
         @Override
         public void facialEmotionRecognitionFinished(final FacialEmotionModel m, boolean success) {
 
@@ -181,21 +194,39 @@ public class ChatActivity extends BaseActivity {
                     @Override
                     public void run() {
                         Pair<Double, String> baseResult = m.getScores().getBestScoredEmotion();
-
+                        int classifiedemotion;
                         String emotion = baseResult.second;
 
                         if (emotion.equals("happiness")) {
                             btnEmotion.setImageResource(R.drawable.ic_happy);
+                            classifiedemotion = Const.Emotion.EMOTION_HAPPINESS;
                         } else if (emotion.equals("surprise")) {
                             btnEmotion.setImageResource(R.drawable.ic_surprise);
+                            classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
                         } else if (emotion.equals("angry")) {
                             btnEmotion.setImageResource(R.drawable.ic_angry);
+                            classifiedemotion = Const.Emotion.EMOTION_ANGRY;
                         } else if(emotion.equals("sadness"))
                         {
                             btnEmotion.setImageResource(R.drawable.ic_sad);
+                            classifiedemotion = Const.Emotion.EMOTION_SADNESS;
                         }else if (emotion.equals("neutral")) {
                             btnEmotion.setImageResource(R.drawable.ic_shy);
+                            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                        }else
+                        {
+                            btnEmotion.setImageResource(R.drawable.ic_shy);
+                            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
                         }
+
+                        if(mHSManager !=  null)
+                        {
+                            Log.i(Const.TAG,"Queue data(HR) : "+mHSManager.getHR());
+                            Log.i(Const.TAG,"Queue data(HRV) : "+mHSManager.getHRV());
+                        }
+
+                        mRecentEmotion.mFinalEstimatedEmotion = classifiedemotion;
+                        mRecentEmotion.mWeight = baseResult.first;
                     }
                 });
             }
@@ -361,6 +392,12 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Log.d(Const.TAG, "onClick of mEmoticonCandidate");
+                Sticker n = EmoticonSuggestionManager.getInstance().getCurrentEmotionEmoticon(mRecentEmotion);
+
+                if(n != null)
+                {
+                    sendSticker(n);
+                }
                 mEmotionTransferInterface.setVisibility(View.GONE);
             }
         });
@@ -457,6 +494,10 @@ public class ChatActivity extends BaseActivity {
 
         // initialize FacialManaer
         FacialEmotionManager.getInstance().initializeFacialManager(mFEMListener);
+
+        // initialize HeartSensorManager
+        mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
+        mHSManager.checkBluetooth();
     }
 
     @Override
@@ -509,6 +550,7 @@ public class ChatActivity extends BaseActivity {
         {
             FacialEmotionManager.getInstance().releaseFacialManager();
         }
+        mHSManager.disconnect();
         super.onDestroy();
     }
 
@@ -615,9 +657,11 @@ public class ChatActivity extends BaseActivity {
             // sbh added
             else if(position == 1)
             {
+
                 //forceStaySocket = true;
                 Toast.makeText(getApplicationContext(),"Stickers activity will be activated",Toast.LENGTH_SHORT).show();
-                ArrayList<Sticker> m = new ArrayList<Sticker>(mLoadedStickersData.data.stickers.get(0).list);
+
+                ArrayList<Sticker> m = new ArrayList<Sticker>(mStickerSet);
 
                 StickerClassificationActivity.startStickerClassificationActivity(getActivity(),m);
             }
@@ -1804,6 +1848,19 @@ public class ChatActivity extends BaseActivity {
             public void onCustomSuccess(Call<GetStickersData> call, Response<GetStickersData> response) {
                 super.onCustomSuccess(call, response);
                 mLoadedStickersData = response.body();
+                // passing all stickers
+                mStickerSet = new ArrayList<Sticker>();
+                for(int i = 0;i<mLoadedStickersData.data.stickers.size();i++)
+                {
+                    if(i>1)
+                    {
+                        break;
+                    }
+                    List<Sticker> tmp = mLoadedStickersData.data.stickers.get(i).list;
+
+                    mStickerSet.addAll(tmp);
+                }
+                EmoticonSuggestionManager.getInstance().initialize(getActivity(),mStickerSet);
                 stickersManager.setStickers(mLoadedStickersData, getSupportFragmentManager());
             }
 

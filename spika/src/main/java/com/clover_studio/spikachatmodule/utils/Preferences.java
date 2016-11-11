@@ -40,21 +40,21 @@ public class Preferences {
         editor.putString(Const.Preferences.TOKEN, token);
         editor.apply();
     }
-    public String getToken(){
+
+    public String getToken() {
         return sharedPreferences.getString(Const.Preferences.TOKEN, "");
     }
+
     //sbh inserted
-    public String getCachedDeviceId()
-    {
-        return sharedPreferences.getString(Const.Preferences.CACHED_DEVICE_ID,null);
+    public String getCachedDeviceId() {
+        return sharedPreferences.getString(Const.Preferences.CACHED_DEVICE_ID, null);
     }
-    public void setDeviceId(String v)
-    {
+
+    public void setDeviceId(String v) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Const.Preferences.CACHED_DEVICE_ID, v);
         editor.apply();
     }
-
 
 
     public void setUserId(String userId) {
@@ -63,7 +63,7 @@ public class Preferences {
         editor.apply();
     }
 
-    public String getUserId(){
+    public String getUserId() {
         return sharedPreferences.getString(Const.Preferences.USER_ID, "");
     }
 
@@ -74,7 +74,7 @@ public class Preferences {
         editor.apply();
     }
 
-    public Config getConfig(){
+    public Config getConfig() {
         Config config = new Config();
         config.apiBaseUrl = sharedPreferences.getString(Const.Preferences.BASE_URL, "");
         config.socketUrl = sharedPreferences.getString(Const.Preferences.SOCKET_URL, "");
@@ -83,16 +83,16 @@ public class Preferences {
         return config;
     }
 
-    public void increaseClickSticker(Sticker sticker){
+    public void increaseClickSticker(Sticker sticker) {
         String json = getStickersString();
-        if(!TextUtils.isEmpty(json)){
+        if (!TextUtils.isEmpty(json)) {
             Gson gson = new Gson();
             try {
                 StickerCategory responseModel = gson.fromJson(json, StickerCategory.class);
-                if(responseModel.list.contains(sticker)){
+                if (responseModel.list.contains(sticker)) {
                     int position = responseModel.list.indexOf(sticker);
-                    responseModel.list.get(position).timesClicked ++;
-                }else{
+                    responseModel.list.get(position).timesClicked++;
+                } else {
                     sticker.timesClicked = 1;
                     responseModel.list.add(sticker);
                 }
@@ -102,7 +102,7 @@ public class Preferences {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else{
+        } else {
             StickerCategory category = new StickerCategory();
             category.list = new ArrayList<>();
             sticker.timesClicked = 1;
@@ -117,13 +117,13 @@ public class Preferences {
         }
     }
 
-    public String getStickersString(){
+    public String getStickersString() {
         return sharedPreferences.getString(Const.Preferences.STICKERS_COUNT, "");
     }
 
-    public StickerCategory getStickersLikeObject(){
+    public StickerCategory getStickersLikeObject() {
         String json = getStickersString();
-        if(TextUtils.isEmpty(json)){
+        if (TextUtils.isEmpty(json)) {
             return null;
         }
         Gson gson = new Gson();
@@ -143,6 +143,17 @@ public class Preferences {
         }
 
         return null;
+    }
+
+    //sbh
+    public void setStickersClassification(String json) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Const.Preferences.STICKERS_CLASSIFICATION, json);
+        editor.apply();
+    }
+
+    public String getStickersClassification() {
+        return sharedPreferences.getString(Const.Preferences.STICKERS_CLASSIFICATION,"");
     }
 
     public void setRecentStickers(String json){

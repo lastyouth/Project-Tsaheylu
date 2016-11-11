@@ -1,66 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:weightSum="100">
-    <TextView
-        android:id="@+id/stickerAddr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="meaninglessdata"
-        android:visibility="gone"/>
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <com.clover_studio.spikachatmodule.view.roundimage.RoundImageView
         android:id="@+id/stickerforclassification"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_vibrate"
-        android:layout_weight="40"/>
+        android:layout_gravity="center"
+        android:src="@drawable/ic_toruk"/>
     <RadioGroup
-        android:orientation="vertical"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/emotionradios"
-        android:layout_weight="60"
         android:layout_marginTop="5dp">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
             <RadioButton
                 android:id="@+id/happiness"
                 android:text="hapinness"
+                android:textSize = "10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <RadioButton
                 android:id="@+id/sadness"
                 android:text="sadness"
+                android:textSize = "10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <RadioButton
                 android:id="@+id/angry"
                 android:text="angry"
+                android:textSize = "10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
             <RadioButton
                 android:id="@+id/surprise"
                 android:text="surprise"
+                android:textSize = "10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <RadioButton
                 android:id="@+id/neutral"
                 android:text="neutral"
+                android:textSize = "10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-        </LinearLayout>
     </RadioGroup>
 </LinearLayout>
