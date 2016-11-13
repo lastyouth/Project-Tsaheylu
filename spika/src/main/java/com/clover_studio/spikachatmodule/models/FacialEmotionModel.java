@@ -192,5 +192,27 @@ public class FacialEmotionModel {
             });
             return forsort.get(0);
         }
+
+        public Pair<Double,String> getBestIncrementScoredEmotionComparedWithPrevEmotion(FacialEmotionModel prev)
+        {
+            List<Pair<Double,String>> forsort = new ArrayList<Pair<Double,String>>();
+            forsort.add(new Pair(anger - prev.getScores().anger,"anger"));
+            //forsort.add(new Pair(contempt,"contempt"));
+            //forsort.add(new Pair(disgust,"disgust"));
+            //forsort.add(new Pair(fear,"fear"));
+            forsort.add(new Pair(happiness - prev.getScores().happiness,"happiness"));
+            forsort.add(new Pair(neutral - prev.getScores().neutral,"neutral"));
+            forsort.add(new Pair(sadness - prev.getScores().sadness, "sadness"));
+            forsort.add(new Pair(surprise - prev.getScores().surprise, "surprise"));
+
+            Collections.sort(forsort, new Comparator<Pair<Double, String>>() {
+
+                @Override
+                public int compare(Pair<Double, String> t1, Pair<Double, String> t2) {
+                    return Double.compare(t2.first, t1.first);
+                }
+            });
+            return forsort.get(0);
+        }
     }
 }

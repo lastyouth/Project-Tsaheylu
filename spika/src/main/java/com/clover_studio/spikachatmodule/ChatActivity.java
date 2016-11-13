@@ -148,6 +148,10 @@ public class ChatActivity extends BaseActivity {
     // sbh : recent emotion
     static private EstimatedEmotionModel mRecentEmotion = new EstimatedEmotionModel();
 
+    // sbh : prev Facial emotion
+
+    private FacialEmotionModel mPrevFacialEmotion = null;
+
     // for loaded stickers
     private GetStickersData mLoadedStickersData;
 
@@ -193,7 +197,15 @@ public class ChatActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Pair<Double, String> baseResult = m.getScores().getBestScoredEmotion();
+                        Pair<Double, String> baseResult;
+                        if(mPrevFacialEmotion != null) {
+                            baseResult = m.getScores().getBestIncrementScoredEmotionComparedWithPrevEmotion(mPrevFacialEmotion);
+                        }
+                        else
+                        {
+                            baseResult = m.getScores().getBestScoredEmotion();
+                        }
+                        mPrevFacialEmotion = m;
                         int classifiedemotion;
                         String emotion = baseResult.second;
 
@@ -1184,7 +1196,7 @@ public class ChatActivity extends BaseActivity {
      */
     protected void sendSticker(Sticker sticker) {
         Message message = new Message();
-        message.fillMessageForSend(activeUser, sticker.fullPic, Const.MessageType.TYPE_STICKER, null);
+        message.fillMessageForSend(activeUser, sticker.smallPic, Const.MessageType.TYPE_STICKER, null);
 
         if(SocketManager.getInstance().isSocketConnect()){
             JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);

@@ -47,7 +47,7 @@ public class FacialEmotionManager {
     private Retrofit mRetrofitForMSEApi;
     private MSEmotionAPISupporter mAPISupporter;
     private static final String BASE_URL_FOR_MSE = "https://api.projectoxford.ai/";
-    private static final String KEY = "1a39795f7c1f4a4fb1428371bc710f52";
+    private static final String KEY = "bef456add71f47c4994e448a950b2771";
     private static final String CONTENT_TYPE = "application/octet-stream";
 
     // TimerTask
@@ -61,7 +61,7 @@ public class FacialEmotionManager {
     };
     private TimerTask mTaskForEmotionRecognizion = null;
     private Timer mTimer = null;
-    public static final long DEFAULT_INTERVAL = 3000; // 3.5secs
+    public static final long DEFAULT_INTERVAL = 750; // 3.5secs
 
     // object state
     private boolean mInitialized = false;
