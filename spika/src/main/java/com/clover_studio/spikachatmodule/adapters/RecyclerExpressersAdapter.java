@@ -82,7 +82,13 @@ public class RecyclerExpressersAdapter extends RecyclerView.Adapter<RecyclerExpr
         holder.stickerIv.setImageDrawable(null);
 
         final Expresser expresser = data.get(position);
-        UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, expresser.smallPic);
+        if(expresser.isOnline) {
+            UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, expresser.smallPic);
+        }
+        else
+        {
+            holder.stickerIv.setImageResource(expresser.targetResource);
+        }
         holder.stickerIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

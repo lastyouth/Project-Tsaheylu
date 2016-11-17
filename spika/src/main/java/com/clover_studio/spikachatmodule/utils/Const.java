@@ -211,6 +211,7 @@ public class Const {
         public static final int ERROR_CODE_SOCKET_LOGIN_NO_USER_ID = 1000025;
         public static final int ERROR_CODE_SOCKET_LOGIN_NO_ROOM_ID = 1000026;
     }
+    //sbh
     public static final class Emotion
     {
         static public final int EMOTION_HAPPINESS = 0x00;
@@ -218,6 +219,14 @@ public class Const {
         static public final int EMOTION_ANGRY = 0x02;
         static public final int EMOTION_SURPRISE = 0x03;
         static public final int EMOTION_NEUTRAL = 0x04;
-        public static final int MAX_QUEUED_DATA_FOR_HRV = 10;
+        static public final int MAX_QUEUED_DATA_FOR_HRV = 10;
+        static public final int MAX_EXPRESSER_CANDIDATE = 5;
+        static public final int CURRENT_EMOTION = 0x1024;
+    }
+    public static final class ExpresserType
+    {
+        static public final int EXPRESSER_STICKER = 0x102040;
+        static public final int EXPRESSER_EFFECT = 0x102041;
+        static public final int EXPRESSER_VIBRATION = 0x102042;
     }
 }

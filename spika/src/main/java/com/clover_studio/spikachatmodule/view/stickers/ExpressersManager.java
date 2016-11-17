@@ -199,7 +199,13 @@ public class ExpressersManager {
             ivExpresserCategory.setPadding((int) padding, (int) padding, (int) padding, (int) padding);
             ivExpresserCategory.setScaleType(ImageView.ScaleType.FIT_CENTER);
             ivExpresserCategory.setBackgroundResource(R.drawable.selector_stickers_category);
-            UtilsImage.setImageWithLoader(ivExpresserCategory, -1, null, category.mainPic);
+            if(category.isOnline) {
+                UtilsImage.setImageWithLoader(ivExpresserCategory, -1, null, category.mainPic);
+            }
+            else
+            {
+                ivExpresserCategory.setImageResource(category.targetResource);
+            }
             //LogCS.e(Const.TAG, "mainPic : " + category.mainPic);
             ivExpresserCategory.setTag(position);
             position++;

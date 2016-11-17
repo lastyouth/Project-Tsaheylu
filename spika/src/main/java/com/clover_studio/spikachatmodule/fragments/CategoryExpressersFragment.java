@@ -68,7 +68,7 @@ public class CategoryExpressersFragment extends Fragment{
             @Override
             public void onItemClicked(Expresser expresser) {
                 if(getActivity() instanceof ChatActivity){
-                    ((ChatActivity)getActivity()).selectStickers(expresser);
+                    ((ChatActivity)getActivity()).selectExpresser(expresser);
                 }
             }
         });
@@ -77,7 +77,7 @@ public class CategoryExpressersFragment extends Fragment{
             @Override
             public void onItemLongClicked(Expresser expresser) {
                 if(getActivity() instanceof ChatActivity){
-                    ((ChatActivity)getActivity()).selectStickerEmotion(expresser);
+                    ((ChatActivity)getActivity()).selectExpresserEmotion(expresser);
                 }
             }
         });

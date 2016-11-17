@@ -1,6 +1,7 @@
 package com.clover_studio.spikachatmodule.models;
 
 import com.clover_studio.spikachatmodule.base.BaseModel;
+import com.clover_studio.spikachatmodule.utils.Const;
 
 import java.io.Serializable;
 
@@ -9,11 +10,12 @@ import java.io.Serializable;
  */
 public class Expresser extends BaseModel implements Serializable{
 
-    public String fullPic;
-    public String smallPic;
+    public String fullPic = null;
+    public String smallPic = null;
     // sbh
+    public int expresserType = Const.ExpresserType.EXPRESSER_STICKER;
     public boolean isOnline = true;
-    public int targetResource;
+    public int targetResource = -1;
 
     //for saving
     public int timesClicked = 0;

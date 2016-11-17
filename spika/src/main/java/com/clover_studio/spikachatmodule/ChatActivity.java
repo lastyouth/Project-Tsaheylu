@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.IntegerRes;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,11 +19,13 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -39,7 +42,7 @@ import com.clover_studio.spikachatmodule.dialogs.InfoMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.NotifyDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.ExpresserClassificationDialog;
-import com.clover_studio.spikachatmodule.emotion.EmoticonSuggestionManager;
+import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
@@ -68,6 +71,7 @@ import com.clover_studio.spikachatmodule.utils.LogCS;
 import com.clover_studio.spikachatmodule.utils.ParseUrlLinkMetadata;
 import com.clover_studio.spikachatmodule.utils.SeenByUtils;
 import com.clover_studio.spikachatmodule.utils.Tools;
+import com.clover_studio.spikachatmodule.utils.UtilsImage;
 import com.clover_studio.spikachatmodule.view.menu.MenuManager;
 import com.clover_studio.spikachatmodule.view.menu.OnMenuManageListener;
 import com.clover_studio.spikachatmodule.view.stickers.OnExpressersManageListener;
@@ -97,27 +101,45 @@ public class ChatActivity extends BaseActivity {
 
     private EditText etMessage;
     private ImageButton btnSend;
-    private ImageButton btnStickers;
+    private ImageButton btnExpressers;
     private ImageButton btnEmotion;
     private ProgressBar pbAboveSend;
     private ButtonType buttonType = ButtonType.MENU;
     private ExpressersType expressersType = ExpressersType.CLOSED;
     private TypingType typingType = TypingType.BLANK;
     private TextView newMessagesButton;
+
+    // for candidate
     private LinearLayout mEmotionTransferInterface;
+    private View.OnClickListener mExpressersCandidateClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int id = v.getId();
+            int emotionType = (Integer)v.getTag();
+
+            Expresser expresser = ExpresserCandidateManager.getInstance().getExpresserList(emotionType).get(id);
+
+            sendExpresser(expresser);
+
+            //Toast.makeText(getActivity(),"imageView : "+id,Toast.LENGTH_SHORT).show();
+
+            if(mEmotionTransferInterface.getVisibility() == View.VISIBLE)
+            {
+                mEmotionTransferInterface.setVisibility(View.GONE);
+
+
+                mEmotionTransferInterface.removeAllViews();
+
+            }
+        }
+    };
+
 
     protected MenuManager menuManager;
     protected ExpressersManager expressersManager;
     protected List<String> sentMessages = new ArrayList<>();
     protected List<User> typingUsers = new ArrayList<>();
 
-    // sbh : for test, below imagebuttons may be managed by inflater
-    private ImageButton mEmoticonCandidate;
-    private ImageButton mFireworkCandidate;
-    private ImageButton mVibrationCandidate = null;
-
-    // sbh : stickerset for auto suggestion
-    private List<Expresser> mExpresserSet;
 
     // sbh : check bluetooth
     private HeartSensorManager mHSManager;
@@ -308,9 +330,11 @@ public class ChatActivity extends BaseActivity {
                 onSendMenuButtonClicked();
             }
         });
+        // always true
+        animateSendButton(true);
 
-        btnStickers = (ImageButton) findViewById(R.id.btnStickers);
-        btnStickers.setOnClickListener(new View.OnClickListener() {
+        btnExpressers = (ImageButton) findViewById(R.id.btnStickers);
+        btnExpressers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onStickersButtonClicked();
@@ -322,90 +346,16 @@ public class ChatActivity extends BaseActivity {
         //sbh
         mEmotionTransferInterface = (LinearLayout)findViewById(R.id.candidates);
         btnEmotion = (ImageButton)findViewById(R.id.btnEmotion);
-        /*btnEmotion.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
 
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    mEmotionTransferInterface.setVisibility(View.VISIBLE);
-
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    mEmotionTransferInterface.setVisibility(View.GONE);
-                }else if(event.getAction() == MotionEvent.ACTION_MOVE)
-                {
-                    int cx,cy;
-                    cx = (int)event.getRawX();
-                    cy = (int)event.getRawY();
-
-                    int tx1,ty1,tx2,ty2;
-                    tx1 = mEmoticonCandidate.getLeft();
-                    tx2 = mEmoticonCandidate.getRight();
-                    ty1 = mEmoticonCandidate.getTop();
-                    ty2 = mEmoticonCandidate.getBottom();
-
-                    if(Tools.pointInside(cx,cy,tx1,tx2,ty1,ty2))
-                    {
-                        Log.d(Const.TAG,"EmotionCandidate is detected");
-                    }
-                }
-                return false;
-            }
-        });*/
         btnEmotion.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                if(mEmotionTransferInterface.getVisibility() == View.GONE) {
-                    mEmotionTransferInterface.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    mEmotionTransferInterface.setVisibility(View.GONE);
-                }
+                onEmotionButtonClicked();
             }
         });
 
-        // tast for candidates
-        mEmoticonCandidate = (ImageButton)findViewById(R.id.candidate_1);
-        mFireworkCandidate = (ImageButton)findViewById(R.id.candidate_2);
-        mVibrationCandidate = (ImageButton)findViewById(R.id.candidate_3);
 
-        mEmoticonCandidate.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(Const.TAG, "onTouch of mEmoticonCandidate : " + event.toString());
-                return false;
-            }
-        });
-        mEmoticonCandidate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(Const.TAG, "onClick of mEmoticonCandidate");
-                Expresser n = EmoticonSuggestionManager.getInstance().getCurrentEmotionEmoticon(mRecentEmotion);
-
-                if(n != null)
-                {
-                    sendExpresser(n);
-                }
-                mEmotionTransferInterface.setVisibility(View.GONE);
-            }
-        });
-
-        mFireworkCandidate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(Const.TAG,"onClick of mFireworkCandidate");
-                mEmotionTransferInterface.setVisibility(View.GONE);
-            }
-        });
-
-        mVibrationCandidate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(Const.TAG,"onClick of mVibrationCandidate");
-                mEmotionTransferInterface.setVisibility(View.GONE);
-            }
-        });
 
         etMessage = (EditText) findViewById(R.id.etMessage);
         etMessage.addTextChangedListener(etMessageTextWatcher);
@@ -583,11 +533,8 @@ public class ChatActivity extends BaseActivity {
             {
 
                 //forceStaySocket = true;
-                Toast.makeText(getApplicationContext(),"Stickers activity will be activated",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Just In Case",Toast.LENGTH_SHORT).show();
 
-                ArrayList<Expresser> m = new ArrayList<Expresser>(mExpresserSet);
-
-                StickerClassificationActivity.startStickerClassificationActivity(getActivity(),m);
             }
             hideSettings();
         }
@@ -604,11 +551,11 @@ public class ChatActivity extends BaseActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (s.length() == 0) {
+            /*if (s.length() == 0) {
                 animateSendButton(false);
             } else {
                 animateSendButton(true);
-            }
+            }*/
             sendTypingType(s.length());
         }
     };
@@ -646,7 +593,7 @@ public class ChatActivity extends BaseActivity {
 
                     firstTime = false;
                 }
-                loadStickers();
+                loadExpressers();
             }
 
         });
@@ -865,7 +812,7 @@ public class ChatActivity extends BaseActivity {
             }
             etMessage.setEnabled(false);
             expressersType = ExpressersType.IN_ANIMATION;
-            expressersManager.openMenu(btnStickers);
+            expressersManager.openMenu(btnExpressers);
             findViewById(R.id.viewForMenuBehind).setVisibility(View.VISIBLE);
         } else if (expressersType == ExpressersType.OPENED) {
             if(expressersType == ExpressersType.IN_ANIMATION){
@@ -877,7 +824,60 @@ public class ChatActivity extends BaseActivity {
     }
     protected void onEmotionButtonClicked()
     {
+        // get final estimatedEmotion
+        int emotionType = mRecentEmotion.mFinalEstimatedEmotion;
 
+        ArrayList<Expresser> mCurrentEmtionExpressers = ExpresserCandidateManager.getInstance().getExpresserList(emotionType);
+
+        if(mCurrentEmtionExpressers == null)
+        {
+            Toast.makeText(this,"Expressers are not ready now",Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+        if(mEmotionTransferInterface.getVisibility() == View.GONE) {
+            ImageView[] mImageView = new ImageView[Const.Emotion.MAX_EXPRESSER_CANDIDATE];
+            float size = 0;
+            for(int i=0;i<Const.Emotion.MAX_EXPRESSER_CANDIDATE;i++)
+            {
+                Expresser expresser = mCurrentEmtionExpressers.get(i);
+
+                mImageView[i] = new ImageView(mEmotionTransferInterface.getContext());
+                mEmotionTransferInterface.addView(mImageView[i],i);
+
+                mImageView[i].setId(i);
+                mImageView[i].setTag(emotionType);
+                mImageView[i].setOnClickListener(mExpressersCandidateClickListener);
+
+                size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, mEmotionTransferInterface.getContext().getResources().getDisplayMetrics());
+
+                mImageView[i].getLayoutParams().width = (int)size;
+                mImageView[i].getLayoutParams().height = (int)size;
+
+                if(expresser.smallPic == null && expresser.targetResource == -1)
+                {
+                    mImageView[i].setImageResource(R.drawable.ic_nosticker);
+                }
+                else
+                {
+                    if(expresser.isOnline)
+                    {
+                        UtilsImage.setImageWithLoader(mImageView[i], -1, null, expresser.smallPic);
+                    }
+                    else
+                    {
+                        mImageView[i].setImageResource(expresser.targetResource);
+                    }
+
+                }
+            }
+            mEmotionTransferInterface.getLayoutParams().width = (int)(size)*(Const.Emotion.MAX_EXPRESSER_CANDIDATE);
+            mEmotionTransferInterface.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mEmotionTransferInterface.setVisibility(View.GONE);
+        }
     }
 
     private void onButtonMenuClicked() {
@@ -901,7 +901,10 @@ public class ChatActivity extends BaseActivity {
     }
 
     protected void onButtonSendClicked() {
-        sendMessage();
+        String text = etMessage.getText().toString();
+        if(text != null && !text.equals("")) {
+            sendMessage();
+        }
     }
 
     private void showSettings() {
@@ -1409,7 +1412,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     //STICKERS
-    private void loadStickers() {
+    private void loadExpressers() {
 
         SpikaOSRetroApiInterface retroApiInterface = getRetrofit().create(SpikaOSRetroApiInterface.class);
         Call<GetExpressersData> call = retroApiInterface.getStickers(SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).getToken());
@@ -1425,7 +1428,6 @@ public class ChatActivity extends BaseActivity {
 
 
                 // re-organizing all expressers.
-                mExpresserSet = new ArrayList<Expresser>();
                 for(int i = 0; i<tmpData.data.expressers.size(); i++)
                 {
                     if(i>3)
@@ -1433,12 +1435,29 @@ public class ChatActivity extends BaseActivity {
                         break;
                     }
                     mLoadedExpressersData.data.expressers.add(tmpData.data.expressers.get(i));
-
-                    List<Expresser> tmp = mLoadedExpressersData.data.expressers.get(i).list;
-
-                    mExpresserSet.addAll(tmp);
                 }
-                EmoticonSuggestionManager.getInstance().initialize(getActivity(), mExpresserSet);
+                // effecter
+                ExpresserCategory mEffect = new ExpresserCategory();
+
+                mEffect.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+                mEffect.isOnline = false;
+                mEffect.targetResource = R.drawable.ic_fireworks;
+                mEffect.list = new ArrayList<Expresser>();
+
+                // vibration
+
+                ExpresserCategory mVibration = new ExpresserCategory();
+
+                mVibration.expresserType = Const.ExpresserType.EXPRESSER_VIBRATION;
+                mVibration.isOnline = false;
+                mVibration.targetResource = R.drawable.ic_vibrate;
+                mVibration.list = new ArrayList<Expresser>();
+
+                mLoadedExpressersData.data.expressers.add(mEffect);
+                mLoadedExpressersData.data.expressers.add(mVibration);
+
+                ExpresserCandidateManager.getInstance().initialize(getActivity());
+
                 expressersManager.setExpressers(mLoadedExpressersData, getSupportFragmentManager());
             }
 
@@ -1446,7 +1465,7 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    public void selectStickers(Expresser expresser){
+    public void selectExpresser(Expresser expresser){
         onStickersButtonClicked();
         sendExpresser(expresser);
         //save to shared
@@ -1454,7 +1473,7 @@ public class ChatActivity extends BaseActivity {
         expressersManager.refreshRecent();
     }
 
-    public void selectStickerEmotion(Expresser expresser)
+    public void selectExpresserEmotion(Expresser expresser)
     {
         ExpresserClassificationDialog.start(this, expresser);
     }

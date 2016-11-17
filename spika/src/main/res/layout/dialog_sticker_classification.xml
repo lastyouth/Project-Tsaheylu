@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/classification_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -61,36 +62,12 @@
                 android:textColor="@color/white"
                 android:textSize="17sp"/>
             <LinearLayout
+                android:id="@+id/classification_candidates"
                 android:paddingBottom="15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="horizontal">
-                <ImageView
-                    android:id="@+id/IV_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_nosticker"/>
-                <ImageView
-                    android:id="@+id/IV_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_nosticker"/>
-                <ImageView
-                    android:id="@+id/IV_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_nosticker"/>
-                <ImageView
-                    android:id="@+id/IV_4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_nosticker"/>
-                <ImageView
-                    android:id="@+id/IV_5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_nosticker"/>
             </LinearLayout>
         </LinearLayout>
 

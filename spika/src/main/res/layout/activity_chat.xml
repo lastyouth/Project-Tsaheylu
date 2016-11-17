@@ -69,36 +69,6 @@
         android:layout_above="@id/layoutForSend"
         android:weightSum="12"
         android:visibility="gone">
-        <ImageButton
-            android:layout_weight="4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/candidate_1"
-            android:src="@drawable/ic_emoticon"
-            android:background="@color/white_trans"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
-            android:scaleType="fitXY"/>
-        <ImageButton
-            android:layout_weight="4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/candidate_2"
-            android:src="@drawable/ic_fireworks"
-            android:background="@color/white_trans"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
-            android:scaleType="fitXY"/>
-        <ImageButton
-            android:layout_weight="4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/candidate_3"
-            android:src="@drawable/ic_vibrate"
-            android:background="@color/white_trans"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
-            android:scaleType="fitXY"/>
     </LinearLayout>
 
     <RelativeLayout
