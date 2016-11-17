@@ -213,6 +213,7 @@ public class FacialEmotionModel {
                 }
             });
             return forsort.get(0);
+            //return getBestScoredEmotion();
         }
     }
 }

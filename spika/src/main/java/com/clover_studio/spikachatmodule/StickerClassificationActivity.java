@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.clover_studio.spikachatmodule.adapters.StickerClassificationRecyclerViewAdapter;
 import com.clover_studio.spikachatmodule.base.BaseActivity;
-import com.clover_studio.spikachatmodule.models.Sticker;
+import com.clover_studio.spikachatmodule.models.Expresser;
 import com.clover_studio.spikachatmodule.utils.Const;
 import com.clover_studio.spikachatmodule.view.CustomTextView;
 
@@ -23,9 +23,9 @@ import java.util.List;
 public class StickerClassificationActivity extends BaseActivity {
     private RecyclerView mStickerClassificationMain;
 
-    public static void startStickerClassificationActivity(Context context, ArrayList<Sticker> stickers){
+    public static void startStickerClassificationActivity(Context context, ArrayList<Expresser> expressers){
         Bundle bundle = new Bundle();
-        bundle.putSerializable("stickers",stickers);
+        bundle.putSerializable("expressers", expressers);
         Intent intent = new Intent(context, StickerClassificationActivity.class);
         intent.putExtra("stickersbundle",bundle);
         context.startActivity(intent);
@@ -38,7 +38,7 @@ public class StickerClassificationActivity extends BaseActivity {
         setMenuLikeBack();
 
         CustomTextView ctv = (CustomTextView)findViewById(R.id.toolbarTitle);
-        ctv.setText("Sticker Classification");
+        ctv.setText("Expresser Classification");
 
         mStickerClassificationMain = (RecyclerView)findViewById(R.id.stickersInfoMain);
 
@@ -49,7 +49,7 @@ public class StickerClassificationActivity extends BaseActivity {
             Log.e(Const.TAG,"Mandatory informations are missing");
             finish();
         }
-        List<Sticker> data = (ArrayList<Sticker>)fromCallerBundle.getSerializable("stickers");
+        List<Expresser> data = (ArrayList<Expresser>)fromCallerBundle.getSerializable("expressers");
         mStickerClassificationMain.setLayoutManager(new LinearLayoutManager(this));
         mStickerClassificationMain.setAdapter(new StickerClassificationRecyclerViewAdapter(this));
 

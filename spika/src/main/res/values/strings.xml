@@ -98,5 +98,12 @@
     <string name="recording_">Recording&#8230;</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
-
+    <!-- sbh added-->
+    <string-array name="emotions">
+        <item>Happiness</item>
+        <item>Sadness</item>
+        <item>Angry</item>
+        <item>Surprise</item>
+        <item>Neutral</item>
+    </string-array>
 </resources>

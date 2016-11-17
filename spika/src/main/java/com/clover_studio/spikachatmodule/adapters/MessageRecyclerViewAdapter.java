@@ -196,41 +196,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<MessageRecy
                     }
                 }
                 break;
-            case Const.MessageType.TYPE_FILE:
-                if (isMessageFromUser(message, myUser)) {
-                    if (message.file != null && Tools.isMimeTypeImage(message.file.file.mimeType)) {
-                        cellType = R.layout.item_message_image_right;
-                    }
-                    else {
-                        cellType = R.layout.item_message_file_right;
-                    }
-                }
-                else {
-                    if (Tools.isMimeTypeImage(message.file.file.mimeType)) {
-                        cellType = R.layout.item_message_image_left;
-                    }
-                    else {
-                        cellType = R.layout.item_message_file_left;
-                    }
-                }
-                break;
-            case Const.MessageType.TYPE_LOCATION:
-                if (isMessageFromUser(message, myUser)) {
-                    cellType = R.layout.item_message_file_right;
-                }
-                else {
-                    cellType = R.layout.item_message_file_left;
-                }
-                break;
-            case Const.MessageType.TYPE_CONTACT:
-                if (isMessageFromUser(message, myUser)) {
-                    cellType = R.layout.item_message_file_right;
-                }
-                else {
-                    cellType = R.layout.item_message_file_left;
-                }
-                break;
-            case Const.MessageType.TYPE_STICKER:
+            case Const.MessageType.TYPE_EXPRESSER:
                 if (isMessageFromUser(message, myUser)) {
                     cellType = R.layout.item_message_sticker_right;
                 }
@@ -261,9 +227,6 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<MessageRecy
         }
         else if (viewType == R.layout.item_message_link_left || viewType == R.layout.item_message_link_right) {
             return new LinkViewHolder(view);
-        }
-        else if (viewType == R.layout.item_message_file_left || viewType == R.layout.item_message_file_right) {
-            return new FileViewHolder(view);
         }
         else if (viewType == R.layout.item_message_sticker_left || viewType == R.layout.item_message_sticker_right) {
             return new StickerViewHolder(view);
@@ -598,13 +561,6 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<MessageRecy
         public void bindItem(int position) {
             super.bindItem(position);
             imageIV.setImageDrawable(null);
-            if(message.file.thumb != null){
-                UtilsImage.setImageWithLoader(imageIV, -1, null, Tools.getFileUrlFromId(message.file.thumb.id, imageIV.getContext()));
-            }else if(message.file.file != null){
-                UtilsImage.setImageWithLoader(imageIV, -1, null, Tools.getFileUrlFromId(message.file.file.id, imageIV.getContext()));
-            }else{
-                imageIV.setImageDrawable(null);
-            }
         }
     }
 
@@ -623,99 +579,6 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<MessageRecy
             super.bindItem(position);
             imageIV.setImageDrawable(null);
             UtilsImage.setImageWithLoader(imageIV, -1, null, message.message);
-        }
-    }
-
-    public class FileViewHolder extends BaseViewHolder {
-
-        ImageView fileIcon;
-
-        TextView title;
-        TextView subTitle;
-        TextView subSubTitle;
-
-        public FileViewHolder(View itemView) {
-            super(itemView);
-            fileIcon = (ImageView) itemView.findViewById(R.id.fileIcon);
-            title = (TextView) itemView.findViewById(R.id.title);
-            subTitle = (TextView) itemView.findViewById(R.id.subTitle);
-            subSubTitle = (TextView) itemView.findViewById(R.id.subSubTitle);
-        }
-
-        @Override
-        public void bindItem(int position) {
-            super.bindItem(position);
-
-            int drawable = 0;
-            subSubTitle.setVisibility(View.VISIBLE);
-            if (message.type == Const.MessageType.TYPE_FILE && message.file != null) {
-
-                title.setText(message.file.file.name);
-                subTitle.setText(Tools.readableFileSize(Long.valueOf(message.file.file.size)));
-                subSubTitle.setText(subSubTitle.getContext().getResources().getString(R.string.download));
-
-                if (Tools.isMimeTypeVideo(message.file.file.mimeType)) {
-                    if (isMessageFromUser(message, myUser)) {
-                        drawable = R.drawable.video_white;
-                    }
-                    else {
-                        drawable = R.drawable.video_color;
-                    }
-                }
-                else if (Tools.isMimeTypeAudio(message.file.file.mimeType)) {
-                    if (isMessageFromUser(message, myUser)) {
-                        drawable = R.drawable.audio_white;
-                    }
-                    else {
-                        drawable = R.drawable.audio_color;
-                    }
-                }else{
-                    if (isMessageFromUser(message, myUser)) {
-                        drawable = R.drawable.file_white;
-                    }
-                    else {
-                        drawable = R.drawable.file_color;
-                    }
-                }
-            }
-            else if (message.type == Const.MessageType.TYPE_LOCATION) {
-
-                title.setText(message.message);
-                subTitle.setText(subTitle.getContext().getResources().getString(R.string.show_location_on_map));
-                subSubTitle.setText("");
-                subSubTitle.setVisibility(View.GONE);
-
-                if (isMessageFromUser(message, myUser)) {
-                    drawable = R.drawable.location_white;
-                }
-                else {
-                    drawable = R.drawable.location_color;
-                }
-            }
-            else if (message.type == Const.MessageType.TYPE_CONTACT) {
-
-                String[] contactData = VCardParser.getNameAndFirstPhoneAndFirstEmail(message.message, title.getContext().getString(R.string.no_name));
-
-                title.setText(contactData[Const.ContactData.NAME]);
-                subTitle.setText(contactData[Const.ContactData.PHONE]);
-                subSubTitle.setText(contactData[Const.ContactData.EMAIL]);
-
-                if (isMessageFromUser(message, myUser)) {
-                    drawable = R.drawable.contact_white;
-                }
-                else {
-                    drawable = R.drawable.contact_color;
-                }
-            }
-            else {
-                if (isMessageFromUser(message, myUser)) {
-                    drawable = R.drawable.file_white;
-                }
-                else {
-                    drawable = R.drawable.file_color;
-                }
-            }
-            fileIcon.setImageResource(drawable);
         }
     }
 

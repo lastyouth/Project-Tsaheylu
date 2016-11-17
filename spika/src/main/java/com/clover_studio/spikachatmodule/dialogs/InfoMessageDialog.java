@@ -164,15 +164,6 @@ public class InfoMessageDialog extends Dialog {
             ((LinearLayout.LayoutParams)viewBelowShare.getLayoutParams()).leftMargin = padding;
             ((LinearLayout.LayoutParams)viewBelowShare.getLayoutParams()).rightMargin = padding;
 
-
-            shareTv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(listener != null){
-                        onShare();
-                    }
-                }
-            });
         }
 
         CustomTextView detailsTV = new CustomTextView(getContext());
@@ -200,12 +191,6 @@ public class InfoMessageDialog extends Dialog {
             }
         });
 
-    }
-
-    private void onShare() {
-        if (listener != null) {
-            listener.onShareClicked(message, InfoMessageDialog.this);
-        }
     }
 
     private void dismissWithDelete() {
@@ -253,7 +238,6 @@ public class InfoMessageDialog extends Dialog {
     public interface OnInfoListener{
         void onDeleteMessage(Message message, Dialog dialog);
         void onDetailsClicked(Message message, Dialog dialog);
-        void onShareClicked(Message message, Dialog dialog);
     }
 
 }

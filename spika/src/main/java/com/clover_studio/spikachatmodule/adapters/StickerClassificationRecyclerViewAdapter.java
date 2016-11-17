@@ -6,16 +6,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.clover_studio.spikachatmodule.R;
 import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
 import com.clover_studio.spikachatmodule.emotion.EmoticonSuggestionManager;
-import com.clover_studio.spikachatmodule.models.Sticker;
+import com.clover_studio.spikachatmodule.models.Expresser;
 import com.clover_studio.spikachatmodule.utils.Const;
 import com.clover_studio.spikachatmodule.utils.UtilsImage;
 import com.clover_studio.spikachatmodule.view.roundimage.RoundedImageView;
@@ -48,14 +45,14 @@ public class StickerClassificationRecyclerViewAdapter extends RecyclerView.Adapt
     // Locally used constant
     static public final int POSITION_ACQUIRED_CONSTANT = 0x12345678;
     // varialbles
-    private List<Sticker> mData;
+    private List<Expresser> mData;
     private Context mContext;
 
 
 
     public StickerClassificationRecyclerViewAdapter(Context context)
     {
-        mData = new ArrayList<Sticker>();
+        mData = new ArrayList<Expresser>();
         mContext = context;
         String json;
         Gson gson = new Gson();
@@ -71,9 +68,9 @@ public class StickerClassificationRecyclerViewAdapter extends RecyclerView.Adapt
 
 
 
-    public void addData(List<Sticker> stickers)
+    public void addData(List<Expresser> expressers)
     {
-        mData.addAll(stickers);
+        mData.addAll(expressers);
         notifyDataSetChanged();
     }
     @Override
@@ -83,7 +80,7 @@ public class StickerClassificationRecyclerViewAdapter extends RecyclerView.Adapt
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.d(Const.TAG,"Position : "+position);
-        Sticker i = mData.get(position);
+        Expresser i = mData.get(position);
         holder.emotionRadioGroup.setTag(POSITION_ACQUIRED_CONSTANT,position);
         //holder.imageForSmallpic =
         UtilsImage.setImageWithLoader(holder.imageForSmallpic, -1, null, i.smallPic);

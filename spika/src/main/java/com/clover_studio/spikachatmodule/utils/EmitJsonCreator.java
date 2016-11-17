@@ -70,31 +70,6 @@ public class EmitJsonCreator {
                 attObject.put("linkData", linkData);
                 obj.put("attributes", attObject);
             }
-            if(message.file != null){
-                JSONObject fileModel = new JSONObject();
-
-                if(message.file.file != null){
-                    JSONObject file = new JSONObject();
-                    file.put("id", message.file.file.id);
-                    file.put("name", message.file.file.name);
-                    file.put("size", message.file.file.size);
-                    file.put("mimeType", message.file.file.mimeType);
-
-                    fileModel.put("file", file);
-                }
-
-                if(message.file.thumb != null){
-                    JSONObject file = new JSONObject();
-                    file.put("id", message.file.thumb.id);
-                    file.put("name", message.file.thumb.name);
-                    file.put("size", message.file.thumb.size);
-                    file.put("mimeType", message.file.thumb.mimeType);
-
-                    fileModel.put("thumb", file);
-                }
-
-                obj.put("file", fileModel);
-            }
             return obj;
         } catch (JSONException e) {
             e.printStackTrace();

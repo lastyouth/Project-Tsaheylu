@@ -8,14 +8,17 @@ import java.util.List;
 /**
  * Created by ubuntu_ivo on 17.07.15..
  */
-public class StickerCategory extends BaseModel implements Serializable{
+public class ExpresserCategory extends BaseModel implements Serializable{
 
     public String mainPic;
-    public List<Sticker> list;
+    public List<Expresser> list;
+    // sbh
+    public boolean isOnline = true;
+    public int targetResource;
 
     @Override
     public String toString() {
-        return "StickerCategory{" +
+        return "ExpresserCategory{" +
                 "mainPic='" + mainPic + '\'' +
                 ", list=" + list +
                 '}';

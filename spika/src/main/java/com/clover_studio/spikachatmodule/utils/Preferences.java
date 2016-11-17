@@ -2,27 +2,17 @@ package com.clover_studio.spikachatmodule.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.clover_studio.spikachatmodule.base.BaseModel;
 import com.clover_studio.spikachatmodule.models.Config;
-import com.clover_studio.spikachatmodule.models.GetStickersData;
-import com.clover_studio.spikachatmodule.models.Message;
-import com.clover_studio.spikachatmodule.models.Sticker;
-import com.clover_studio.spikachatmodule.models.StickerCategory;
-import com.clover_studio.spikachatmodule.models.User;
+import com.clover_studio.spikachatmodule.models.Expresser;
+import com.clover_studio.spikachatmodule.models.ExpresserCategory;
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Created by ubuntu_ivo on 22.07.15..
@@ -83,18 +73,18 @@ public class Preferences {
         return config;
     }
 
-    public void increaseClickSticker(Sticker sticker) {
+    public void increaseClickSticker(Expresser expresser) {
         String json = getStickersString();
         if (!TextUtils.isEmpty(json)) {
             Gson gson = new Gson();
             try {
-                StickerCategory responseModel = gson.fromJson(json, StickerCategory.class);
-                if (responseModel.list.contains(sticker)) {
-                    int position = responseModel.list.indexOf(sticker);
+                ExpresserCategory responseModel = gson.fromJson(json, ExpresserCategory.class);
+                if (responseModel.list.contains(expresser)) {
+                    int position = responseModel.list.indexOf(expresser);
                     responseModel.list.get(position).timesClicked++;
                 } else {
-                    sticker.timesClicked = 1;
-                    responseModel.list.add(sticker);
+                    expresser.timesClicked = 1;
+                    responseModel.list.add(expresser);
                 }
 
                 String jsonNew = gson.toJson(responseModel);
@@ -103,10 +93,10 @@ public class Preferences {
                 e.printStackTrace();
             }
         } else {
-            StickerCategory category = new StickerCategory();
+            ExpresserCategory category = new ExpresserCategory();
             category.list = new ArrayList<>();
-            sticker.timesClicked = 1;
-            category.list.add(sticker);
+            expresser.timesClicked = 1;
+            category.list.add(expresser);
             Gson gson = new Gson();
             try {
                 String jsonNew = gson.toJson(category);
@@ -121,18 +111,18 @@ public class Preferences {
         return sharedPreferences.getString(Const.Preferences.STICKERS_COUNT, "");
     }
 
-    public StickerCategory getStickersLikeObject() {
+    public ExpresserCategory getStickersLikeObject() {
         String json = getStickersString();
         if (TextUtils.isEmpty(json)) {
             return null;
         }
         Gson gson = new Gson();
         try {
-            StickerCategory responseModel = gson.fromJson(json, StickerCategory.class);
+            ExpresserCategory responseModel = gson.fromJson(json, ExpresserCategory.class);
 
-            Collections.sort(responseModel.list, new Comparator<Sticker>() {
+            Collections.sort(responseModel.list, new Comparator<Expresser>() {
                 @Override
-                public int compare(Sticker lhs, Sticker rhs) {
+                public int compare(Expresser lhs, Expresser rhs) {
                     return rhs.timesClicked - lhs.timesClicked;
                 }
             });

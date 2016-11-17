@@ -2,11 +2,9 @@ package com.clover_studio.spikachatmodule.emotion;
 
 import android.content.Context;
 
-import com.clover_studio.spikachatmodule.adapters.RecyclerStickersAdapter;
-import com.clover_studio.spikachatmodule.adapters.StickerClassificationRecyclerViewAdapter;
 import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
 import com.clover_studio.spikachatmodule.models.EstimatedEmotionModel;
-import com.clover_studio.spikachatmodule.models.Sticker;
+import com.clover_studio.spikachatmodule.models.Expresser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -36,21 +34,20 @@ public class EmoticonSuggestionManager {
     static public final int EMOTION_NEUTRAL = 0x04;*/
     private Map<String, Integer> mStickerClassification = null;
     private Context mContext = null;
-    private List<Sticker> mStickers = null;
+    private List<Expresser> mExpressers = null;
     private boolean mInitialized = false;
     private boolean mEmoticonReady = false;
-    private List<Sticker> mHappinessEmoticons = new ArrayList<Sticker>();
-    private List<Sticker> mSadnessEmoticons = new ArrayList<Sticker>();
-    private List<Sticker> mAngryEmoticons = new ArrayList<Sticker>();
-    private List<Sticker> mSurpriseEmoticons = new ArrayList<Sticker>();
-    private List<Sticker> mNeutralEmoticons = new ArrayList<Sticker>();
+    private List<Expresser> mHappinessEmoticons = new ArrayList<Expresser>();
+    private List<Expresser> mSadnessEmoticons = new ArrayList<Expresser>();
+    private List<Expresser> mAngryEmoticons = new ArrayList<Expresser>();
+    private List<Expresser> mSurpriseEmoticons = new ArrayList<Expresser>();
+    private List<Expresser> mNeutralEmoticons = new ArrayList<Expresser>();
 
     public void updateStickerClassification() {
         String json;
         Gson gson = new Gson();
         if(mInitialized) {
             Type type =  new TypeToken<Map<String,Integer>>(){}.getType();
-
             json = SingletonLikeApp.getInstance().getSharedPreferences(mContext).getStickersClassification();
             if(json.equals(""))
             {
@@ -64,7 +61,7 @@ public class EmoticonSuggestionManager {
             mNeutralEmoticons.clear();
             mSurpriseEmoticons.clear();
 
-            for (Sticker s: mStickers) {
+            for (Expresser s: mExpressers) {
                 String key = s.smallPic;
 
                 if(mStickerClassification.containsKey(key))
@@ -103,18 +100,18 @@ public class EmoticonSuggestionManager {
         }
         return mInstance;
     }
-    public void initialize(Context c, List<Sticker> s)
+    public void initialize(Context c, List<Expresser> s)
     {
         mContext = c;
-        mStickers = s;
+        mExpressers = s;
         mInitialized = true;
 
         updateStickerClassification();
     }
 
-    public Sticker getCurrentEmotionEmoticon(EstimatedEmotionModel e)
+    public Expresser getCurrentEmotionEmoticon(EstimatedEmotionModel e)
     {
-        Sticker ret = null;
+        Expresser ret = null;
         Random rn = new Random();
         int emotionType = e.mFinalEstimatedEmotion;
 

@@ -10,7 +10,6 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.util.Log;
 
-import com.clover_studio.spikachatmodule.CameraPhotoPreviewActivity;
 import com.clover_studio.spikachatmodule.api.retrofit.MSEmotionAPISupporter;
 import com.clover_studio.spikachatmodule.models.FacialEmotionModel;
 import com.clover_studio.spikachatmodule.utils.Const;
@@ -22,7 +21,6 @@ import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,7 +59,7 @@ public class FacialEmotionManager {
     };
     private TimerTask mTaskForEmotionRecognizion = null;
     private Timer mTimer = null;
-    public static final long DEFAULT_INTERVAL = 750; // 3.5secs
+    public static final long DEFAULT_INTERVAL = 1000; // 1sec
 
     // object state
     private boolean mInitialized = false;

@@ -88,7 +88,7 @@ public class Const {
         public static final int TYPE_FILE = 2;
         public static final int TYPE_LOCATION = 3;
         public static final int TYPE_CONTACT = 4;
-        public static final int TYPE_STICKER = 5;
+        public static final int TYPE_EXPRESSER = 5;
         public static final int TYPE_NEW_USER = 1000;
         public static final int TYPE_USER_LEAVE = 1001;
     }

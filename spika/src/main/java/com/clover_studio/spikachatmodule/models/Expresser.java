@@ -7,17 +7,20 @@ import java.io.Serializable;
 /**
  * Created by ubuntu_ivo on 17.07.15..
  */
-public class Sticker extends BaseModel implements Serializable{
+public class Expresser extends BaseModel implements Serializable{
 
     public String fullPic;
     public String smallPic;
+    // sbh
+    public boolean isOnline = true;
+    public int targetResource;
 
     //for saving
     public int timesClicked = 0;
 
     @Override
     public String toString() {
-        return "Sticker{" +
+        return "Expresser{" +
                 "fullPic='" + fullPic + '\'' +
                 ", smallPic='" + smallPic + '\'' +
                 ", timesClicked=" + timesClicked +
@@ -29,10 +32,10 @@ public class Sticker extends BaseModel implements Serializable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Sticker sticker = (Sticker) o;
+        Expresser expresser = (Expresser) o;
 
-        if (fullPic != null ? !fullPic.equals(sticker.fullPic) : sticker.fullPic != null) return false;
-        return !(smallPic != null ? !smallPic.equals(sticker.smallPic) : sticker.smallPic != null);
+        if (fullPic != null ? !fullPic.equals(expresser.fullPic) : expresser.fullPic != null) return false;
+        return !(smallPic != null ? !smallPic.equals(expresser.smallPic) : expresser.smallPic != null);
 
     }
 

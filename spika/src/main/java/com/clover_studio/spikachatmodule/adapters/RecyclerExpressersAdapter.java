@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.clover_studio.spikachatmodule.R;
-import com.clover_studio.spikachatmodule.models.Sticker;
+import com.clover_studio.spikachatmodule.models.Expresser;
 import com.clover_studio.spikachatmodule.utils.UtilsImage;
 
 import java.util.ArrayList;
@@ -16,12 +16,13 @@ import java.util.List;
 /**
  * Created by ubuntu_ivo on 23.03.16..
  */
-public class RecyclerStickersAdapter extends RecyclerView.Adapter<RecyclerStickersAdapter.ViewHolder>{
+public class RecyclerExpressersAdapter extends RecyclerView.Adapter<RecyclerExpressersAdapter.ViewHolder>{
 
-    private List<Sticker> data;
+    private List<Expresser> data;
     private OnItemClickedListener onItemClickedListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
-    public RecyclerStickersAdapter(List<Sticker> data){
+    public RecyclerExpressersAdapter(List<Expresser> data){
         this.data = data;
     }
 
@@ -29,7 +30,12 @@ public class RecyclerStickersAdapter extends RecyclerView.Adapter<RecyclerSticke
         onItemClickedListener = listener;
     }
 
-    public void setData (List<Sticker> data){
+    public void setLongClickListener(OnItemLongClickListener listener)
+    {
+        onItemLongClickListener = listener;
+    }
+
+    public void setData (List<Expresser> data){
         if(this.data == null){
             this.data = new ArrayList<>();
         }
@@ -38,7 +44,7 @@ public class RecyclerStickersAdapter extends RecyclerView.Adapter<RecyclerSticke
         notifyDataSetChanged();
     }
 
-    public void addData (List<Sticker> data){
+    public void addData (List<Expresser> data){
         if(this.data == null){
             this.data = new ArrayList<>();
         }
@@ -75,17 +81,25 @@ public class RecyclerStickersAdapter extends RecyclerView.Adapter<RecyclerSticke
 
         holder.stickerIv.setImageDrawable(null);
 
-        final Sticker sticker = data.get(position);
-        UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, sticker.smallPic);
+        final Expresser expresser = data.get(position);
+        UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, expresser.smallPic);
         holder.stickerIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(onItemClickedListener != null){
-                    onItemClickedListener.onItemClicked(sticker);
+                    onItemClickedListener.onItemClicked(expresser);
                 }
             }
         });
+        // sbh
+        holder.stickerIv.setOnLongClickListener(new View.OnLongClickListener(){
 
+            @Override
+            public boolean onLongClick(View v) {
+                onItemLongClickListener.onItemLongClicked(expresser);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -94,7 +108,10 @@ public class RecyclerStickersAdapter extends RecyclerView.Adapter<RecyclerSticke
     }
 
     public interface OnItemClickedListener{
-        void onItemClicked(Sticker sticker);
+        void onItemClicked(Expresser expresser);
+    }
+    public interface OnItemLongClickListener{
+        void onItemLongClicked(Expresser expresser);
     }
 
 }

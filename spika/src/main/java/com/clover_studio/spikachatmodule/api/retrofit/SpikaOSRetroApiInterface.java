@@ -2,7 +2,7 @@ package com.clover_studio.spikachatmodule.api.retrofit;
 
 
 import com.clover_studio.spikachatmodule.models.GetMessagesModel;
-import com.clover_studio.spikachatmodule.models.GetStickersData;
+import com.clover_studio.spikachatmodule.models.GetExpressersData;
 import com.clover_studio.spikachatmodule.models.GetUserModel;
 import com.clover_studio.spikachatmodule.models.Login;
 import com.clover_studio.spikachatmodule.models.User;
@@ -36,6 +36,6 @@ public interface SpikaOSRetroApiInterface {
 //    Call<GetMessagesModel> getLastFromMessageId(@Path(Const.GetParams.ROOM_ID) String roomId, @Path(Const.GetParams.LAST_MESSAGE_ID) String lastMessageId, @Header(Const.HeadersParams.ACCESS_TOKEN) String token);
 
     @GET(Const.Api.STICKERS)
-    Call<GetStickersData> getStickers(@Header(Const.Params.ACCESS_TOKEN) String token);
+    Call<GetExpressersData> getStickers(@Header(Const.Params.ACCESS_TOKEN) String token);
 
 }

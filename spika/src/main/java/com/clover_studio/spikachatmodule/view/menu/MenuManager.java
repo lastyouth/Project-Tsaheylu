@@ -30,58 +30,28 @@ public class MenuManager {
     private LinearLayout contact;
 
     private OnMenuManageListener listener;
-    private OnMenuButtonsListener buttonsListener;
 
-    public void setMenuLayout(Activity activity, int menuLayoutId, OnMenuManageListener listener, final OnMenuButtonsListener buttonsListener){
+    public void setMenuLayout(Activity activity, int menuLayoutId, OnMenuManageListener listener){
 
         rlMenuMain = (RelativeLayout) activity.findViewById(menuLayoutId);
-        location = (LinearLayout) activity.findViewById(R.id.location);
+        //location = (LinearLayout) activity.findViewById(R.id.location);
         camera = (LinearLayout) activity.findViewById(R.id.camera);
         gallery = (LinearLayout) activity.findViewById(R.id.gallery);
         audio = (LinearLayout) activity.findViewById(R.id.audio);
         video = (LinearLayout) activity.findViewById(R.id.video);
-        contact = (LinearLayout) activity.findViewById(R.id.contact);
-        file = (LinearLayout) activity.findViewById(R.id.file);
+        //contact = (LinearLayout) activity.findViewById(R.id.contact);
+        //file = (LinearLayout) activity.findViewById(R.id.file);
 
         this.listener = listener;
-        this.buttonsListener = buttonsListener;
 
-        location.setOnClickListener(new View.OnClickListener() {
+        /*location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 buttonsListener.onLocationClicked();
             }
-        });
+        });*/
 
-        camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonsListener.onCameraClicked();
-            }
-        });
-
-        gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonsListener.onGalleryClicked();
-            }
-        });
-
-        audio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonsListener.onAudioClicked();
-            }
-        });
-
-        video.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonsListener.onVideoClicked();
-            }
-        });
-
-        file.setOnClickListener(new View.OnClickListener() {
+        /*file.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 buttonsListener.onFileClicked();
@@ -93,7 +63,7 @@ public class MenuManager {
             public void onClick(View v) {
                 buttonsListener.onContactClicked();
             }
-        });
+        });*/
 
 
     }
@@ -142,11 +112,11 @@ public class MenuManager {
         int offset = 50;
 
         singleButtonAnimationOn(audio, start + 0 * offset);
-        singleButtonAnimationOn(contact, start + 1 * offset);
-        singleButtonAnimationOn(location, start + 2 * offset);
+        //singleButtonAnimationOn(contact, start + 1 * offset);
+        //singleButtonAnimationOn(location, start + 2 * offset);
         singleButtonAnimationOn(video, start + 3 * offset);
         singleButtonAnimationOn(gallery, start + 4 * offset);
-        singleButtonAnimationOn(file, start + 5 * offset);
+        //singleButtonAnimationOn(file, start + 5 * offset);
         singleButtonAnimationOn(camera, start + 6 * offset);
 
     }
@@ -196,12 +166,12 @@ public class MenuManager {
     protected void handleButtonsOnClose(){
 
         singleButtonAnimationOff(audio, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
-        singleButtonAnimationOff(location, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
+        //singleButtonAnimationOff(location, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
         singleButtonAnimationOff(video, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
         singleButtonAnimationOff(gallery, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
-        singleButtonAnimationOff(contact, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
+        //singleButtonAnimationOff(contact, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
         singleButtonAnimationOff(camera, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
-        singleButtonAnimationOff(file, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
+        //singleButtonAnimationOff(file, Const.AnimationDuration.MENU_LAYOUT_ANIMATION_DURATION);
 
     }
 

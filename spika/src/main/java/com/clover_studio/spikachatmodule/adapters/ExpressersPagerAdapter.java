@@ -11,12 +11,12 @@ import java.util.List;
 /**
  * Created by ubuntu_ivo on 23.03.16..
  */
-public class StickersPagerAdapter extends FragmentStatePagerAdapter{
+public class ExpressersPagerAdapter extends FragmentStatePagerAdapter{
 
     private Context ctx;
     private List<Fragment> data = new ArrayList<>();
 
-    public StickersPagerAdapter(FragmentManager fm, Context context, List<Fragment> newData) {
+    public ExpressersPagerAdapter(FragmentManager fm, Context context, List<Fragment> newData) {
         super(fm);
 
         this.ctx = context;

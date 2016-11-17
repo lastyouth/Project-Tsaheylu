@@ -30,7 +30,6 @@ public class Message extends BaseModel {
     public String roomId;
     public String message;
     public long created;
-    public FileModel file;
     public String localID;
     public List<SeenByModel> seenBy;
     public long deleted = -1;
@@ -55,7 +54,6 @@ public class Message extends BaseModel {
         roomId = message.roomId;
         this.message = message.message;
         created = message.created;
-        file = message.file;
         localID = message.localID;
         seenBy = message.seenBy;
         deleted = message.deleted;
@@ -74,7 +72,6 @@ public class Message extends BaseModel {
                 ", roomId='" + roomId + '\'' +
                 ", message='" + message + '\'' +
                 ", created=" + created +
-                ", file=" + file +
                 ", localID='" + localID + '\'' +
                 ", seenBy=" + seenBy +
                 ", status=" + status +
@@ -181,7 +178,7 @@ public class Message extends BaseModel {
         return "";
     }
 
-    public void fillMessageForSend(User activeUser, String messageString, int typeMessage, FileModel fileMessage){
+    public void fillMessageForSend(User activeUser, String messageString, int typeMessage){
         userID = activeUser.userID;
         roomID = activeUser.roomID;
         localID = Tools.generateRandomString(32);
@@ -189,10 +186,6 @@ public class Message extends BaseModel {
         status = Const.MessageStatus.SENT;
         message = messageString;
         created = System.currentTimeMillis();
-
-        if(fileMessage != null){
-            file = fileMessage;
-        }
 
     }
 

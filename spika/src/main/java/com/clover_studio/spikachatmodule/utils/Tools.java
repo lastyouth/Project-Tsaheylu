@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.clover_studio.spikachatmodule.R;
-import com.clover_studio.spikachatmodule.api.DownloadFileManager;
 import com.clover_studio.spikachatmodule.base.BaseActivity;
 import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
 
@@ -92,92 +91,8 @@ public class Tools {
         return (x <= x2 && x >= x1 && y <= y2 && y >= y1);
     }
 
-    /**
-     * get image path from uri
-     * @param cntx
-     * @param uri uri of file
-     * @param isOverJellyBeam is android version over jelly beam version
-     * @return string
-     */
-    public static String getImagePath(Context cntx, Uri uri, boolean isOverJellyBeam) {
 
-        String extension = ".jpg";
 
-        if (isOverJellyBeam) {
-            try {
-                ParcelFileDescriptor parcelFileDescriptor = cntx.getContentResolver().openFileDescriptor(uri, "r");
-                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                // Bitmap image =
-                // BitmapFactory.decodeFileDescriptor(fileDescriptor);
-                copyStream(new FileInputStream(fileDescriptor), new FileOutputStream(new File(Tools.getTempFolderPath() + "/" + Const.FilesName.IMAGE_TEMP_FILE_NAME + extension)));
-                parcelFileDescriptor.close();
-                // saveBitmapToFile(image, cntx.getExternalCacheDir() + "/" +
-                // "image_profile");
-                return Tools.getTempFolderPath() + "/" + Const.FilesName.IMAGE_TEMP_FILE_NAME + extension;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "";
-            }
-
-        } else {
-
-            String[] projection = {MediaStore.Images.Media.DATA};
-            Cursor cursor = cntx.getContentResolver().query(uri, projection, null, null, null);
-
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-
-            String returnedString = cursor.getString(column_index);
-            cursor.close();
-
-            return returnedString;
-        }
-    }
-
-    /**
-     * copy stream without progress listener
-     * @param is input stream
-     * @param os output stream
-     */
-    public static void copyStream(InputStream is, OutputStream os) {
-        copyStream(is, os, -1, null);
-    }
-
-    /**
-     *
-     * copy stream with progress listener
-     *
-     * @param is input stream
-     * @param os output stream
-     * @param length length of stream
-     * @param listener progress listener
-     */
-    public static void copyStream(InputStream is, OutputStream os, long length, DownloadFileManager.OnDownloadListener listener) {
-        final int buffer_size = 1024;
-        int totalLen = 0;
-        try {
-
-            byte[] bytes = new byte[buffer_size];
-            while (true) {
-                // Read byte from input stream
-
-                int count = is.read(bytes, 0, buffer_size);
-                if (count == -1) {
-                    listener.onFinishDownload();
-                    break;
-                }
-
-                // Write byte from output stream
-                if (length != -1 && listener != null) {
-                    totalLen = totalLen + count;
-                    listener.onProgress(totalLen);
-                }
-                os.write(bytes, 0, count);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image

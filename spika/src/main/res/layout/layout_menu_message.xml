@@ -36,7 +36,7 @@
                     android:layout_width="match_parent"
                     android:baselineAligned="false"
                     android:layout_height="wrap_content"
-                    android:weightSum="99"
+                    android:weightSum="100"
                     android:layout_below="@id/select_and_attach_label"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="1dp"
@@ -46,7 +46,7 @@
                     <LinearLayout
                         android:id="@+id/camera"
                         android:layout_width="0dp"
-                        android:layout_weight="33"
+                        android:layout_weight="50"
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp"
                         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                     <LinearLayout
                         android:id="@+id/gallery"
                         android:layout_width="0dp"
-                        android:layout_weight="33"
+                        android:layout_weight="50"
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp"
                         android:layout_height="wrap_content"
@@ -107,41 +107,11 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/location"
-                        android:layout_width="0dp"
-                        android:layout_weight="33"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="15dp"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/menu_background_click_state"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:visibility="invisible">
 
-                        <ImageView
-                            android:id="@+id/locationBtn"
-                            android:contentDescription="@null"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/icon_menu_location"
-                            android:background="@android:color/transparent"
-                            />
-
-                        <com.clover_studio.spikachatmodule.view.CustomTextView
-                            android:id="@+id/locationTv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/location"
-                            android:textColor="@android:color/white"
-                            android:textSize="@dimen/menu_text_size"/>
-
-                    </LinearLayout>
 
                 </LinearLayout>
 
-                <LinearLayout
+                <!--<LinearLayout
                     android:id="@+id/secondRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -217,13 +187,13 @@
 
                     </LinearLayout>
 
-                </LinearLayout>
+                </LinearLayout>-->
 
                 <LinearLayout
                     android:id="@+id/thirdRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/secondRow"
+                    android:layout_below="@id/firstRow"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="1dp"
                     android:baselineAligned="false"
