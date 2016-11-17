@@ -1,6 +1,5 @@
 package com.clover_studio.spikachatmodule;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
@@ -8,16 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,20 +31,14 @@ import android.widget.Toast;
 
 import com.clover_studio.spikachatmodule.adapters.MessageRecyclerViewAdapter;
 import com.clover_studio.spikachatmodule.adapters.SettingsAdapter;
-import com.clover_studio.spikachatmodule.api.DownloadFileManager;
-import com.clover_studio.spikachatmodule.api.UploadFileManagement;
 import com.clover_studio.spikachatmodule.api.retrofit.CustomResponse;
 import com.clover_studio.spikachatmodule.api.retrofit.SpikaOSRetroApiInterface;
 import com.clover_studio.spikachatmodule.base.BaseActivity;
 import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
-import com.clover_studio.spikachatmodule.dialogs.DownloadFileDialog;
 import com.clover_studio.spikachatmodule.dialogs.InfoMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.NotifyDialog;
-import com.clover_studio.spikachatmodule.dialogs.PreviewAudioDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewMessageDialog;
-import com.clover_studio.spikachatmodule.dialogs.PreviewPhotoDialog;
-import com.clover_studio.spikachatmodule.dialogs.PreviewVideoDialog;
-import com.clover_studio.spikachatmodule.dialogs.UploadFileDialog;
+import com.clover_studio.spikachatmodule.dialogs.ExpresserClassificationDialog;
 import com.clover_studio.spikachatmodule.emotion.EmoticonSuggestionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
@@ -62,45 +48,36 @@ import com.clover_studio.spikachatmodule.managers.socket.SocketManagerListener;
 import com.clover_studio.spikachatmodule.models.Attributes;
 import com.clover_studio.spikachatmodule.models.Config;
 import com.clover_studio.spikachatmodule.models.EstimatedEmotionModel;
+import com.clover_studio.spikachatmodule.models.Expresser;
+import com.clover_studio.spikachatmodule.models.ExpresserCategory;
 import com.clover_studio.spikachatmodule.models.FacialEmotionModel;
 import com.clover_studio.spikachatmodule.models.GetMessagesModel;
-import com.clover_studio.spikachatmodule.models.GetStickersData;
+import com.clover_studio.spikachatmodule.models.GetExpressersData;
 import com.clover_studio.spikachatmodule.models.Login;
 import com.clover_studio.spikachatmodule.models.Message;
 import com.clover_studio.spikachatmodule.models.ParsedUrlData;
 import com.clover_studio.spikachatmodule.models.SendTyping;
-import com.clover_studio.spikachatmodule.models.Sticker;
-import com.clover_studio.spikachatmodule.models.UploadFileResult;
 import com.clover_studio.spikachatmodule.models.User;
 import com.clover_studio.spikachatmodule.utils.AnimUtils;
 import com.clover_studio.spikachatmodule.utils.ApplicationStateManager;
-import com.clover_studio.spikachatmodule.utils.BuildTempFileAsync;
 import com.clover_studio.spikachatmodule.utils.Const;
 import com.clover_studio.spikachatmodule.utils.CustomImageDownloader;
 import com.clover_studio.spikachatmodule.utils.EmitJsonCreator;
 import com.clover_studio.spikachatmodule.utils.ErrorHandle;
 import com.clover_studio.spikachatmodule.utils.LogCS;
-import com.clover_studio.spikachatmodule.utils.OpenDownloadedFile;
 import com.clover_studio.spikachatmodule.utils.ParseUrlLinkMetadata;
 import com.clover_studio.spikachatmodule.utils.SeenByUtils;
 import com.clover_studio.spikachatmodule.utils.Tools;
 import com.clover_studio.spikachatmodule.view.menu.MenuManager;
-import com.clover_studio.spikachatmodule.view.menu.OnMenuButtonsListener;
 import com.clover_studio.spikachatmodule.view.menu.OnMenuManageListener;
-import com.clover_studio.spikachatmodule.view.stickers.OnStickersManageListener;
-import com.clover_studio.spikachatmodule.view.stickers.StickersManager;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
+import com.clover_studio.spikachatmodule.view.stickers.OnExpressersManageListener;
+import com.clover_studio.spikachatmodule.view.stickers.ExpressersManager;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,13 +101,13 @@ public class ChatActivity extends BaseActivity {
     private ImageButton btnEmotion;
     private ProgressBar pbAboveSend;
     private ButtonType buttonType = ButtonType.MENU;
-    private StickersType stickersType = StickersType.CLOSED;
+    private ExpressersType expressersType = ExpressersType.CLOSED;
     private TypingType typingType = TypingType.BLANK;
     private TextView newMessagesButton;
     private LinearLayout mEmotionTransferInterface;
 
     protected MenuManager menuManager;
-    protected StickersManager stickersManager;
+    protected ExpressersManager expressersManager;
     protected List<String> sentMessages = new ArrayList<>();
     protected List<User> typingUsers = new ArrayList<>();
 
@@ -140,7 +117,7 @@ public class ChatActivity extends BaseActivity {
     private ImageButton mVibrationCandidate = null;
 
     // sbh : stickerset for auto suggestion
-    private List<Sticker> mStickerSet;
+    private List<Expresser> mExpresserSet;
 
     // sbh : check bluetooth
     private HeartSensorManager mHSManager;
@@ -152,8 +129,8 @@ public class ChatActivity extends BaseActivity {
 
     private FacialEmotionModel mPrevFacialEmotion = null;
 
-    // for loaded stickers
-    private GetStickersData mLoadedStickersData;
+    // for loaded expressers
+    private GetExpressersData mLoadedExpressersData;
 
     //data from last paging
     protected List<Message> lastDataFromServer = new ArrayList<>();
@@ -179,7 +156,7 @@ public class ChatActivity extends BaseActivity {
         MENU, SEND, MENU_OPENED, IN_ANIMATION;
     }
 
-    public enum StickersType {
+    public enum ExpressersType {
         CLOSED, OPENED, IN_ANIMATION;
     }
 
@@ -404,11 +381,11 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Log.d(Const.TAG, "onClick of mEmoticonCandidate");
-                Sticker n = EmoticonSuggestionManager.getInstance().getCurrentEmotionEmoticon(mRecentEmotion);
+                Expresser n = EmoticonSuggestionManager.getInstance().getCurrentEmotionEmoticon(mRecentEmotion);
 
                 if(n != null)
                 {
-                    sendSticker(n);
+                    sendExpresser(n);
                 }
                 mEmotionTransferInterface.setVisibility(View.GONE);
             }
@@ -436,10 +413,10 @@ public class ChatActivity extends BaseActivity {
         tvTyping = (TextView) findViewById(R.id.toolbarSubtitle);
 
         menuManager = new MenuManager();
-        menuManager.setMenuLayout(this, R.id.menuMain, onMenuManagerListener, onMenuButtonsListener);
+        menuManager.setMenuLayout(this, R.id.menuMain, onMenuManagerListener);
 
-        stickersManager = new StickersManager();
-        stickersManager.setStickersLayout(this, R.id.stickersMain, onStickersManageListener);
+        expressersManager = new ExpressersManager();
+        expressersManager.setStickersLayout(this, R.id.stickersMain, onExpressersManageListener);
 
         //check for user
         if (!getIntent().hasExtra(Const.Extras.USER)) {
@@ -470,7 +447,7 @@ public class ChatActivity extends BaseActivity {
         findViewById(R.id.viewForMenuBehind).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (stickersType == StickersType.OPENED) {
+                if (expressersType == ExpressersType.OPENED) {
                     onStickersButtonClicked();
                 } else if (buttonType == ButtonType.MENU_OPENED) {
                     onButtonMenuOpenedClicked();
@@ -580,82 +557,17 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
-    protected OnStickersManageListener onStickersManageListener = new OnStickersManageListener() {
+    protected OnExpressersManageListener onExpressersManageListener = new OnExpressersManageListener() {
         @Override
-        public void onStickersOpened() {
-            stickersType = StickersType.OPENED;
+        public void onExpressersOpened() {
+            expressersType = ExpressersType.OPENED;
         }
 
         @Override
-        public void onStickersClosed() {
-            stickersType = StickersType.CLOSED;
+        public void onExpressersClosed() {
+            expressersType = ExpressersType.CLOSED;
             etMessage.setEnabled(true);
             findViewById(R.id.viewForMenuBehind).setVisibility(View.GONE);
-        }
-    };
-
-    protected OnMenuButtonsListener onMenuButtonsListener = new OnMenuButtonsListener() {
-        @Override
-        public void onCameraClicked() {
-            forceStaySocket = true;
-            CameraPhotoPreviewActivity.starCameraPhotoPreviewActivity(getActivity());
-            onButtonMenuOpenedClicked();
-        }
-
-        @Override
-        public void onAudioClicked() {
-            forceStaySocket = true;
-            onButtonMenuOpenedClicked();
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Const.PermissionCode.MICROPHONE);
-            } else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, Const.PermissionCode.MICROPHONE);
-            } else if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Const.PermissionCode.MICROPHONE);
-            } else {
-                RecordAudioActivity.starRecordAudioActivity(getActivity());
-            }
-        }
-
-        @Override
-        public void onFileClicked() {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*");
-            forceStaySocket = true;
-            startActivityForResult(intent, Const.RequestCode.PICK_FILE);
-            onButtonMenuOpenedClicked();
-        }
-
-        @Override
-        public void onVideoClicked() {
-            forceStaySocket = true;
-            RecordVideoActivity.starVideoPreviewActivity(getActivity());
-            onButtonMenuOpenedClicked();
-        }
-
-        @Override
-        public void onLocationClicked() {
-            forceStaySocket = true;
-
-            Log.d(Const.TAG,"onLocationClicked() invoked");
-        }
-
-        @Override
-        public void onGalleryClicked() {
-            forceStaySocket = true;
-            CameraPhotoPreviewActivity.starCameraFromGalleryPhotoPreviewActivity(getActivity());
-            onButtonMenuOpenedClicked();
-        }
-
-        @Override
-        public void onContactClicked() {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, Const.PermissionCode.READ_CONTACTS);
-            } else {
-                requestContacts();
-            }
-            onButtonMenuOpenedClicked();
         }
     };
 
@@ -673,7 +585,7 @@ public class ChatActivity extends BaseActivity {
                 //forceStaySocket = true;
                 Toast.makeText(getApplicationContext(),"Stickers activity will be activated",Toast.LENGTH_SHORT).show();
 
-                ArrayList<Sticker> m = new ArrayList<Sticker>(mStickerSet);
+                ArrayList<Expresser> m = new ArrayList<Expresser>(mExpresserSet);
 
                 StickerClassificationActivity.startStickerClassificationActivity(getActivity(),m);
             }
@@ -851,35 +763,14 @@ public class ChatActivity extends BaseActivity {
             if (item.deleted != -1 && item.deleted != 0) {
                 return;
             }
-            if (item.type == Const.MessageType.TYPE_FILE) {
-                if (Tools.isMimeTypeImage(item.file.file.mimeType)) {
-                    PreviewPhotoDialog.startDialog(getActivity(), Tools.getFileUrlFromId(item.file.file.id, getActivity()), item);
-                } else if (Tools.isMimeTypeVideo(item.file.file.mimeType)) {
-                    PreviewVideoDialog.startDialog(getActivity(), item.file);
-                } else if (Tools.isMimeTypeAudio(item.file.file.mimeType)) {
-                    PreviewAudioDialog.startDialog(getActivity(), item.file);
-                } else {
-                    downloadFile(item);
-                }
-            } else if (item.type == Const.MessageType.TYPE_LOCATION) {
-                forceStaySocket = true;
-                /*if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    tempLocationForPermission = item.location;
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, Const.PermissionCode.LOCATION_THEIR);
-                } else {
-                    LocationActivity.startShowLocationActivity(getActivity(), item.location.lat, item.location.lng);
-                }*/
-                Log.d(Const.TAG,"onClickItem() invoked");
-            } else if (item.type == Const.MessageType.TYPE_CONTACT) {
-                OpenDownloadedFile.selectedContactDialog(item.message, getActivity());
-            } else {
-                if(item.attributes != null && item.attributes.linkData != null){
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.attributes.linkData.url));
-                    startActivity(browserIntent);
-                }else{
-                    // do nothing for now
-                }
+
+            if(item.attributes != null && item.attributes.linkData != null){
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.attributes.linkData.url));
+                startActivity(browserIntent);
+            }else{
+                // do nothing for now
             }
+
         }
 
         @Override
@@ -898,9 +789,6 @@ public class ChatActivity extends BaseActivity {
             }
 
             boolean showShare = false;
-            if(item.type == Const.MessageType.TYPE_FILE && Tools.isMimeTypeImage(item.file.file.mimeType)){
-                showShare = true;
-            }
 
             InfoMessageDialog.startDialogWithOptions(getActivity(), item, activeUser, showCopy, showDelete, showShare, new InfoMessageDialog.OnInfoListener() {
                 @Override
@@ -911,35 +799,6 @@ public class ChatActivity extends BaseActivity {
                 @Override
                 public void onDetailsClicked(Message message, Dialog dialog) {
                     openMessageInfoDialog(message);
-                }
-
-                @Override
-                public void onShareClicked(Message message, Dialog dialog) {
-                    handleProgress(true);
-                    File file = new File(Tools.getImageFolderPath() + "/" + message.created + message.file.file.name);
-
-                    if(file.exists()){
-                        Tools.shareImage(getActivity(), file);
-                    }else{
-                        DownloadFileManager.downloadVideo(getActivity(), Tools.getFileUrlFromId(message.file.file.id, getActivity()), file, new DownloadFileManager.OnDownloadListener() {
-                            @Override
-                            public void onStart() {}
-
-                            @Override
-                            public void onSetMax(int max) {}
-
-                            @Override
-                            public void onProgress(int current) {}
-
-                            @Override
-                            public void onFinishDownload() {}
-
-                            @Override
-                            public void onResponse(boolean isSuccess, String path) {
-                                Tools.shareImage(getActivity(), new File(path));
-                            }
-                        });
-                    }
                 }
             });
 
@@ -1000,20 +859,20 @@ public class ChatActivity extends BaseActivity {
     }
 
     protected void onStickersButtonClicked() {
-        if (stickersType == StickersType.CLOSED) {
-            if(stickersType == StickersType.IN_ANIMATION){
+        if (expressersType == ExpressersType.CLOSED) {
+            if(expressersType == ExpressersType.IN_ANIMATION){
                 return;
             }
             etMessage.setEnabled(false);
-            stickersType = StickersType.IN_ANIMATION;
-            stickersManager.openMenu(btnStickers);
+            expressersType = ExpressersType.IN_ANIMATION;
+            expressersManager.openMenu(btnStickers);
             findViewById(R.id.viewForMenuBehind).setVisibility(View.VISIBLE);
-        } else if (stickersType == StickersType.OPENED) {
-            if(stickersType == StickersType.IN_ANIMATION){
+        } else if (expressersType == ExpressersType.OPENED) {
+            if(expressersType == ExpressersType.IN_ANIMATION){
                 return;
             }
-            stickersType = StickersType.IN_ANIMATION;
-            stickersManager.closeMenu();
+            expressersType = ExpressersType.IN_ANIMATION;
+            expressersManager.closeMenu();
         }
     }
     protected void onEmotionButtonClicked()
@@ -1102,7 +961,7 @@ public class ChatActivity extends BaseActivity {
         }
 
         final Message message = new Message();
-        message.fillMessageForSend(activeUser, etMessage.getText().toString(), Const.MessageType.TYPE_TEXT,null);
+        message.fillMessageForSend(activeUser, etMessage.getText().toString(), Const.MessageType.TYPE_TEXT);
         if(hasLink){
             btnSend.setVisibility(View.INVISIBLE);
             pbAboveSend.setVisibility(View.VISIBLE);
@@ -1145,28 +1004,6 @@ public class ChatActivity extends BaseActivity {
     }
 
     /**
-     * send message type file
-     *
-     * @param result upload file data
-     */
-    protected void sendFile(UploadFileResult result) {
-        Message message = new Message();
-        message.fillMessageForSend(activeUser, "", Const.MessageType.TYPE_FILE, result.data);
-
-        etMessage.setText("");
-
-        if(SocketManager.getInstance().isSocketConnect()){
-            JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
-            SocketManager.getInstance().emitMessage(Const.EmitKeyWord.SEND_MESSAGE, emitMessage);
-        }else{
-            unSentMessageList.add(message);
-        }
-
-        onMessageSent(message);
-
-    }
-
-    /**
      * send contact
      *
      * @param name            name of contact
@@ -1174,7 +1011,7 @@ public class ChatActivity extends BaseActivity {
      */
     protected void sendContact(String name, String vCardLikeString) {
         Message message = new Message();
-        message.fillMessageForSend(activeUser, vCardLikeString, Const.MessageType.TYPE_CONTACT,null);
+        message.fillMessageForSend(activeUser, vCardLikeString, Const.MessageType.TYPE_CONTACT);
 
         etMessage.setText("");
 
@@ -1190,13 +1027,13 @@ public class ChatActivity extends BaseActivity {
     }
 
     /**
-     * send stickers
+     * send expressers
      *
-     * @param sticker   sticker to send
+     * @param expresser   expresser to send
      */
-    protected void sendSticker(Sticker sticker) {
+    protected void sendExpresser(Expresser expresser) {
         Message message = new Message();
-        message.fillMessageForSend(activeUser, sticker.smallPic, Const.MessageType.TYPE_STICKER, null);
+        message.fillMessageForSend(activeUser, expresser.smallPic, Const.MessageType.TYPE_EXPRESSER);
 
         if(SocketManager.getInstance().isSocketConnect()){
             JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
@@ -1504,7 +1341,7 @@ public class ChatActivity extends BaseActivity {
             onButtonMenuOpenedClicked();
             return;
         }
-        if (stickersType == StickersType.OPENED) {
+        if (expressersType == ExpressersType.OPENED) {
             onStickersButtonClicked();
             return;
         }
@@ -1514,61 +1351,7 @@ public class ChatActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Const.RequestCode.PHOTO_CHOOSE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null && data.getExtras().containsKey(Const.Extras.UPLOAD_MODEL)) {
-                    UploadFileResult model = data.getExtras().getParcelable(Const.Extras.UPLOAD_MODEL);
-                    sendFile(model);
-                }
-            }
-        } else if (requestCode == Const.RequestCode.PICK_FILE) {
-            if (resultCode == RESULT_OK) {
-                getFile(data);
-            }
-        } else if (requestCode == Const.RequestCode.VIDEO_CHOOSE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null && data.getExtras().containsKey(Const.Extras.UPLOAD_MODEL)) {
-                    UploadFileResult model = data.getExtras().getParcelable(Const.Extras.UPLOAD_MODEL);
-                    sendFile(model);
-                }
-            }
-        } else if (requestCode == Const.RequestCode.AUDIO_CHOOSE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null && data.getExtras().containsKey(Const.Extras.UPLOAD_MODEL)) {
-                    UploadFileResult model = data.getExtras().getParcelable(Const.Extras.UPLOAD_MODEL);
-                    sendFile(model);
-                }
-            }
-        } else if (requestCode == Const.RequestCode.CONTACT_CHOOSE) {
-            if (resultCode == RESULT_OK) {
-                Uri contactData = data.getData();
-                Cursor cursor = getContentResolver().query(contactData, null, null, null, null);
-                try {
-                    int nameColumn = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-                    if (cursor.moveToFirst()) {
-                        String name = cursor.getString(nameColumn);
-                        String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
-                        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_VCARD_URI, lookupKey);
-                        AssetFileDescriptor fd;
-                        fd = getContentResolver().openAssetFileDescriptor(uri, "r");
-                        FileInputStream fis = fd.createInputStream();
-                        byte[] b = new byte[(int) fd.getDeclaredLength()];
-                        fis.read(b);
-                        String vCard = new String(b);
 
-                        sendContact(name, vCard);
-                    } else {
-                        NotifyDialog.startInfo(getActivity(), getString(R.string.contact_error_title), getString(R.string.contact_error_select));
-                    }
-                    cursor.close();
-                } catch (Exception ex) {
-                    cursor.close();
-                    NotifyDialog.startInfo(getActivity(), getString(R.string.contact_error_title), getString(R.string.contact_error_select));
-                }
-
-
-            }
-        }
     }
 
     //************** ui customization methods
@@ -1578,217 +1361,6 @@ public class ChatActivity extends BaseActivity {
     //******************************************
 
     //************** download and upload file
-
-    private void getFile(Intent data) {
-        Uri fileUri = data.getData();
-
-        String fileName = null;
-        String filePath = null;
-
-        if (fileUri.getScheme().equals("content")) {
-
-            String proj[];
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                proj = new String[]{MediaStore.Files.FileColumns.DISPLAY_NAME};
-            } else {
-                proj = new String[]{MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.DISPLAY_NAME};
-            }
-            Cursor cursor = getContentResolver().query(fileUri, proj, null, null, null);
-            cursor.moveToFirst();
-
-            int column_index_name = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
-            int column_index_path = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-
-            fileName = cursor.getString(column_index_name);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                try {
-                    new BuildTempFileAsync(this, fileName, new BuildTempFileAsync.OnTempFileCreatedListener() {
-                        @Override
-                        public void onTempFileCreated(String path, String name) {
-                            if (TextUtils.isEmpty(path)) {
-                                onFileSelected(RESULT_CANCELED, null, null);
-                            } else {
-                                onFileSelected(RESULT_OK, name, path);
-                            }
-                        }
-                    }).execute(getContentResolver().openInputStream(fileUri));
-                    // async task initialized, exit
-                    cursor.close();
-                    return;
-                } catch (FileNotFoundException ignored) {
-                    filePath = "";
-                }
-            } else {
-                filePath = cursor.getString(column_index_path);
-            }
-
-            cursor.close();
-
-        } else if (fileUri.getScheme().equals("file")) {
-
-            File file = new File(URI.create(fileUri.toString()));
-            fileName = file.getName();
-            filePath = file.getAbsolutePath();
-
-            if (!TextUtils.isEmpty(fileName) && !TextUtils.isEmpty(filePath)) {
-                onFileSelected(RESULT_OK, fileName, filePath);
-            } else {
-                onFileSelected(RESULT_CANCELED, null, null);
-            }
-        }
-
-    }
-
-    private void onFileSelected(int resultOk, String fileName, String filePath) {
-        if (resultOk == RESULT_OK) {
-            uploadFile(fileName, filePath);
-        }
-    }
-
-    private void uploadFile(String fileName, String filePath) {
-
-        String mimeType = Tools.getMimeType(filePath);
-        if (TextUtils.isEmpty(mimeType)) {
-            mimeType = Const.ContentTypes.OTHER;
-        }
-
-        final UploadFileDialog dialog = UploadFileDialog.startDialog(getActivity());
-
-        UploadFileManagement tt = new UploadFileManagement();
-        tt.new BackgroundUploader(SingletonLikeApp.getInstance().getConfig(getActivity()).apiBaseUrl + Const.Api.UPLOAD_FILE, new File(filePath), mimeType, new UploadFileManagement.OnUploadResponse() {
-            @Override
-            public void onStart() {
-                LogCS.d("LOG", "START UPLOADING");
-            }
-
-            @Override
-            public void onSetMax(final int max) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.setMax(max);
-                    }
-                });
-            }
-
-            @Override
-            public void onProgress(final int current) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.setCurrent(current);
-                    }
-                });
-            }
-
-            @Override
-            public void onFinishUpload() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.fileUploaded();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(final boolean isSuccess, final String result) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.dismiss();
-                        if (!isSuccess) {
-                            onResponseFailed();
-                        } else {
-                            onResponseFinish(result);
-                        }
-                    }
-                });
-            }
-        }).execute();
-    }
-
-    private void onResponseFailed() {
-        NotifyDialog.startInfo(getActivity(), getString(R.string.error), getString(R.string.file_not_found));
-    }
-
-    private void onResponseFinish(String result) {
-        Gson gson = new Gson();
-
-        UploadFileResult data = null;
-        try {
-            data = gson.fromJson(result, UploadFileResult.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (data != null) {
-            sendFile(data);
-        }
-    }
-
-    private void downloadFile(Message item) {
-
-        File file = new File(Tools.getDownloadFolderPath() + "/" + item.created + item.file.file.name);
-
-        if (file.exists()) {
-            OpenDownloadedFile.downloadedFileDialog(file, getActivity());
-        } else {
-
-            final DownloadFileDialog dialog = DownloadFileDialog.startDialog(getActivity());
-
-            DownloadFileManager.downloadVideo(getActivity(), Tools.getFileUrlFromId(item.file.file.id, getActivity()), file, new DownloadFileManager.OnDownloadListener() {
-                @Override
-                public void onStart() {
-                    LogCS.d("LOG", "START UPLOADING");
-                }
-
-                @Override
-                public void onSetMax(final int max) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setMax(max);
-                        }
-                    });
-                }
-
-                @Override
-                public void onProgress(final int current) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setCurrent(current);
-                        }
-                    });
-                }
-
-                @Override
-                public void onFinishDownload() {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.fileDownloaded();
-                        }
-                    });
-                }
-
-                @Override
-                public void onResponse(boolean isSuccess, final String path) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                            OpenDownloadedFile.downloadedFileDialog(new File(path), getActivity());
-                        }
-                    });
-                }
-            });
-
-        }
-
-    }
 
     //************************************************
 
@@ -1802,19 +1374,6 @@ public class ChatActivity extends BaseActivity {
                 }
                 return;
             }
-            case Const.PermissionCode.READ_CONTACTS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    requestContacts();
-                }
-                return;
-            }
-            case Const.PermissionCode.MICROPHONE: {
-                if (grantResults.length > 0 && Tools.checkGrantResults(grantResults)) {
-                    RecordAudioActivity.starRecordAudioActivity(getActivity());
-                }
-                return;
-            }
-
             // other 'case' lines to check for other
             // permissions this app might request
         }
@@ -1853,38 +1412,50 @@ public class ChatActivity extends BaseActivity {
     private void loadStickers() {
 
         SpikaOSRetroApiInterface retroApiInterface = getRetrofit().create(SpikaOSRetroApiInterface.class);
-        Call<GetStickersData> call = retroApiInterface.getStickers(SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).getToken());
-        call.enqueue(new CustomResponse<GetStickersData>(getActivity(), false, false) {
+        Call<GetExpressersData> call = retroApiInterface.getStickers(SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).getToken());
+        call.enqueue(new CustomResponse<GetExpressersData>(getActivity(), false, false) {
 
             @Override
-            public void onCustomSuccess(Call<GetStickersData> call, Response<GetStickersData> response) {
+            public void onCustomSuccess(Call<GetExpressersData> call, Response<GetExpressersData> response) {
                 super.onCustomSuccess(call, response);
-                mLoadedStickersData = response.body();
-                // passing all stickers
-                mStickerSet = new ArrayList<Sticker>();
-                for(int i = 0;i<mLoadedStickersData.data.stickers.size();i++)
+                GetExpressersData tmpData = response.body();
+                mLoadedExpressersData = new GetExpressersData();
+                mLoadedExpressersData.data = new GetExpressersData().new GetExpressersInsideData();
+                mLoadedExpressersData.data.expressers = new ArrayList<ExpresserCategory>();
+
+
+                // re-organizing all expressers.
+                mExpresserSet = new ArrayList<Expresser>();
+                for(int i = 0; i<tmpData.data.expressers.size(); i++)
                 {
-                    if(i>1)
+                    if(i>3)
                     {
                         break;
                     }
-                    List<Sticker> tmp = mLoadedStickersData.data.stickers.get(i).list;
+                    mLoadedExpressersData.data.expressers.add(tmpData.data.expressers.get(i));
 
-                    mStickerSet.addAll(tmp);
+                    List<Expresser> tmp = mLoadedExpressersData.data.expressers.get(i).list;
+
+                    mExpresserSet.addAll(tmp);
                 }
-                EmoticonSuggestionManager.getInstance().initialize(getActivity(),mStickerSet);
-                stickersManager.setStickers(mLoadedStickersData, getSupportFragmentManager());
+                EmoticonSuggestionManager.getInstance().initialize(getActivity(), mExpresserSet);
+                expressersManager.setExpressers(mLoadedExpressersData, getSupportFragmentManager());
             }
 
         });
 
     }
 
-    public void selectStickers(Sticker sticker){
+    public void selectStickers(Expresser expresser){
         onStickersButtonClicked();
-        sendSticker(sticker);
+        sendExpresser(expresser);
         //save to shared
-        SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).increaseClickSticker(sticker);
-        stickersManager.refreshRecent();
+        SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).increaseClickSticker(expresser);
+        expressersManager.refreshRecent();
+    }
+
+    public void selectStickerEmotion(Expresser expresser)
+    {
+        ExpresserClassificationDialog.start(this, expresser);
     }
 }
