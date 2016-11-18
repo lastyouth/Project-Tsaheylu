@@ -136,14 +136,14 @@ public class Preferences {
     }
 
     //sbh
-    public void setStickersClassification(String json) {
+    public void setExpressersClassification(String json) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Const.Preferences.STICKERS_CLASSIFICATION, json);
+        editor.putString(Const.Preferences.EXPRESSERS_CLASSIFICATION, json);
         editor.apply();
     }
 
-    public String getStickersClassification() {
-        return sharedPreferences.getString(Const.Preferences.STICKERS_CLASSIFICATION,"");
+    public String getExpressersClassification() {
+        return sharedPreferences.getString(Const.Preferences.EXPRESSERS_CLASSIFICATION,"");
     }
 
     public void setRecentStickers(String json){

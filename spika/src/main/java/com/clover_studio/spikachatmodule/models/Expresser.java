@@ -40,6 +40,14 @@ public class Expresser extends BaseModel implements Serializable{
         return !(smallPic != null ? !smallPic.equals(expresser.smallPic) : expresser.smallPic != null);
 
     }
+    public boolean there_is_no_cow_level()
+    {
+        if(smallPic == null && fullPic == null && targetResource == -1)
+        {
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public int hashCode() {

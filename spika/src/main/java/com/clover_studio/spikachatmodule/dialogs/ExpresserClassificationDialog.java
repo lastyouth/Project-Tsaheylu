@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.clover_studio.spikachatmodule.R;
 import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
@@ -32,7 +33,6 @@ public class ExpresserClassificationDialog extends Dialog {
     private Expresser mExpresser;
     private ImageView mCurrentExpresser;
     private LinearLayout mCandidates;
-    private RelativeLayout mDialog;
     private ImageView[] mIvCandidates;
     private AdapterView.OnItemSelectedListener mEmotionItemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
@@ -41,8 +41,6 @@ public class ExpresserClassificationDialog extends Dialog {
             int emotionType = getCurrentEmotionType(currentEmotion);
 
             updateExpresserCandidate(emotionType);
-
-            Log.i(Const.TAG,currentEmotion);
         }
 
         @Override
@@ -50,12 +48,6 @@ public class ExpresserClassificationDialog extends Dialog {
 
         }
     };
-    /*
-    * <item>Happiness</item>
-        <item>Sadness</item>
-        <item>Angry</item>
-        <item>Surprise</item>
-        <item>Neutral</item>*/
     private View.OnClickListener mCandidateClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -65,6 +57,8 @@ public class ExpresserClassificationDialog extends Dialog {
             int emotionType = getCurrentEmotionType(currentEmotion);
 
             ExpresserCandidateManager.getInstance().updateStickerClassification(mExpresser,emotionType,id);
+
+            Toast.makeText(mContext,"Done!",Toast.LENGTH_SHORT).show();
 
             dismiss();
         }
@@ -115,7 +109,6 @@ public class ExpresserClassificationDialog extends Dialog {
         mEmotionSpinner.setAdapter(mAdapter);
         mEmotionSpinner.setOnItemSelectedListener(mEmotionItemSelectedListener);
         mCandidates = (LinearLayout)findViewById(R.id.classification_candidates);
-        mDialog = (RelativeLayout)findViewById(R.id.classification_dialog);
 
 
         if(mExpresser.isOnline) {
@@ -150,14 +143,22 @@ public class ExpresserClassificationDialog extends Dialog {
     {
         if(mCandidates == null)
         {
-            return;
+            dismiss();
         }
         ArrayList<Expresser> tmpExpressers = ExpresserCandidateManager.getInstance().getExpresserList(emotionType);
+
+        if(tmpExpressers == null)
+        {
+            Toast.makeText(mContext,"Online expressers are not initialized! Try again",Toast.LENGTH_SHORT).show();
+            dismiss();
+        }
+
+
         for(int i=0;i<Const.Emotion.MAX_EXPRESSER_CANDIDATE;i++)
         {
             Expresser expresser = tmpExpressers.get(i);
 
-            if(expresser.smallPic == null && expresser.targetResource == -1)
+            if(expresser.there_is_no_cow_level())
             {
                 // not initialized
                 mIvCandidates[i].setImageResource(R.drawable.ic_nosticker);

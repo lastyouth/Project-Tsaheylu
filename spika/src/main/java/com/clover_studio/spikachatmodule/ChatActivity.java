@@ -7,10 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.IntegerRes;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +20,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -42,6 +41,7 @@ import com.clover_studio.spikachatmodule.dialogs.InfoMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.NotifyDialog;
 import com.clover_studio.spikachatmodule.dialogs.PreviewMessageDialog;
 import com.clover_studio.spikachatmodule.dialogs.ExpresserClassificationDialog;
+import com.clover_studio.spikachatmodule.emotion.EffectManager;
 import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
@@ -117,9 +117,24 @@ public class ChatActivity extends BaseActivity {
             int id = v.getId();
             int emotionType = (Integer)v.getTag();
 
-            Expresser expresser = ExpresserCandidateManager.getInstance().getExpresserList(emotionType).get(id);
+            ArrayList<Expresser> candidates = ExpresserCandidateManager.getInstance().getExpresserList(emotionType);
 
-            sendExpresser(expresser);
+            if(candidates == null)
+            {
+                // not initialized or wrong emotionType
+                Toast.makeText(getActivity(),"Online expressers are not initialized! Try again",Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Expresser expresser = candidates.get(id);
+
+            if(expresser.there_is_no_cow_level())
+            {
+                Toast.makeText(getActivity(),"Empty Slot!",Toast.LENGTH_SHORT).show();
+            }
+            else {
+                sendExpresser(expresser);
+            }
 
             //Toast.makeText(getActivity(),"imageView : "+id,Toast.LENGTH_SHORT).show();
 
@@ -337,7 +352,7 @@ public class ChatActivity extends BaseActivity {
         btnExpressers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onStickersButtonClicked();
+                onExpressersButtonClicked();
             }
         });
 
@@ -398,7 +413,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (expressersType == ExpressersType.OPENED) {
-                    onStickersButtonClicked();
+                    onExpressersButtonClicked();
                 } else if (buttonType == ButtonType.MENU_OPENED) {
                     onButtonMenuOpenedClicked();
                 }
@@ -437,6 +452,11 @@ public class ChatActivity extends BaseActivity {
         // initialize HeartSensorManager
         mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
         mHSManager.checkBluetooth();
+
+        // initialize EffectManager
+        Point displaySize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(displaySize);
+        EffectManager.getInstance().initialize(this,displaySize.x,displaySize.y);
     }
 
     @Override
@@ -534,6 +554,8 @@ public class ChatActivity extends BaseActivity {
 
                 //forceStaySocket = true;
                 Toast.makeText(getApplicationContext(),"Just In Case",Toast.LENGTH_SHORT).show();
+
+                EffectManager.getInstance().performEffect(null);
 
             }
             hideSettings();
@@ -805,7 +827,7 @@ public class ChatActivity extends BaseActivity {
         }
     }
 
-    protected void onStickersButtonClicked() {
+    protected void onExpressersButtonClicked() {
         if (expressersType == ExpressersType.CLOSED) {
             if(expressersType == ExpressersType.IN_ANIMATION){
                 return;
@@ -854,7 +876,7 @@ public class ChatActivity extends BaseActivity {
                 mImageView[i].getLayoutParams().width = (int)size;
                 mImageView[i].getLayoutParams().height = (int)size;
 
-                if(expresser.smallPic == null && expresser.targetResource == -1)
+                if(expresser.there_is_no_cow_level())
                 {
                     mImageView[i].setImageResource(R.drawable.ic_nosticker);
                 }
@@ -964,7 +986,7 @@ public class ChatActivity extends BaseActivity {
         }
 
         final Message message = new Message();
-        message.fillMessageForSend(activeUser, etMessage.getText().toString(), Const.MessageType.TYPE_TEXT);
+        message.fillMessageForSend(activeUser, etMessage.getText().toString(), Const.MessageType.TYPE_TEXT,null);
         if(hasLink){
             btnSend.setVisibility(View.INVISIBLE);
             pbAboveSend.setVisibility(View.VISIBLE);
@@ -1006,28 +1028,6 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    /**
-     * send contact
-     *
-     * @param name            name of contact
-     * @param vCardLikeString vCard in string format
-     */
-    protected void sendContact(String name, String vCardLikeString) {
-        Message message = new Message();
-        message.fillMessageForSend(activeUser, vCardLikeString, Const.MessageType.TYPE_CONTACT);
-
-        etMessage.setText("");
-
-        if(SocketManager.getInstance().isSocketConnect()){
-            JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
-            SocketManager.getInstance().emitMessage(Const.EmitKeyWord.SEND_MESSAGE, emitMessage);
-        }else{
-            unSentMessageList.add(message);
-        }
-
-        onMessageSent(message);
-
-    }
 
     /**
      * send expressers
@@ -1036,7 +1036,7 @@ public class ChatActivity extends BaseActivity {
      */
     protected void sendExpresser(Expresser expresser) {
         Message message = new Message();
-        message.fillMessageForSend(activeUser, expresser.smallPic, Const.MessageType.TYPE_EXPRESSER);
+        message.fillMessageForSend(activeUser, expresser.smallPic, Const.MessageType.TYPE_EXPRESSER,expresser);
 
         if(SocketManager.getInstance().isSocketConnect()){
             JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
@@ -1109,6 +1109,18 @@ public class ChatActivity extends BaseActivity {
     private void onMessageSent(Message sendMessage) {
         MessageRecyclerViewAdapter adapter = (MessageRecyclerViewAdapter) rvMessages.getAdapter();
         adapter.addSentMessage(sendMessage);
+        if(sendMessage.type == Const.MessageType.TYPE_EXPRESSER)
+        {
+            Expresser expresser = sendMessage.expresser;
+
+            if(!expresser.there_is_no_cow_level() && !expresser.isOnline)
+            {
+                if(expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT)
+                {
+                    EffectManager.getInstance().performEffect(expresser);
+                }
+            }
+        }
         sentMessages.add(sendMessage.localID);
         lastVisibleItem = adapter.getItemCount();
         scrollRecyclerToBottom();
@@ -1137,6 +1149,22 @@ public class ChatActivity extends BaseActivity {
                     }
 
                     adapter.addReceivedMessage(message);
+
+                    // check? sbh
+
+                    if(message.type == Const.MessageType.TYPE_EXPRESSER)
+                    {
+                        Expresser expresser = message.expresser;
+
+                        if(!expresser.there_is_no_cow_level() && !expresser.isOnline)
+                        {
+                            if(expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT)
+                            {
+                                EffectManager.getInstance().performEffect(expresser);
+                            }
+                        }
+                    }
+
 
                     if(toScrollBottom) {
                         scrollRecyclerToBottom();
@@ -1345,7 +1373,7 @@ public class ChatActivity extends BaseActivity {
             return;
         }
         if (expressersType == ExpressersType.OPENED) {
-            onStickersButtonClicked();
+            onExpressersButtonClicked();
             return;
         }
         super.onBackPressed();
@@ -1444,6 +1472,18 @@ public class ChatActivity extends BaseActivity {
                 mEffect.targetResource = R.drawable.ic_fireworks;
                 mEffect.list = new ArrayList<Expresser>();
 
+                // sample effecter
+
+                Expresser effect_1 = new Expresser();
+
+                effect_1.isOnline = false;
+                effect_1.targetResource = R.drawable.ic_green_star;
+                effect_1.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effect_1);
+
+
+
                 // vibration
 
                 ExpresserCategory mVibration = new ExpresserCategory();
@@ -1466,7 +1506,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     public void selectExpresser(Expresser expresser){
-        onStickersButtonClicked();
+        onExpressersButtonClicked();
         sendExpresser(expresser);
         //save to shared
         SingletonLikeApp.getInstance().getSharedPreferences(getActivity()).increaseClickSticker(expresser);

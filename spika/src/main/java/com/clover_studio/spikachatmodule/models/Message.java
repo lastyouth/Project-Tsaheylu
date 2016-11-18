@@ -35,6 +35,8 @@ public class Message extends BaseModel {
     public long deleted = -1;
     public Attributes attributes;
 
+    public Expresser expresser;
+
     public int status;
 
     //for date compare, this is used just in live adapter, do not save to base or make it parcelable
@@ -178,7 +180,7 @@ public class Message extends BaseModel {
         return "";
     }
 
-    public void fillMessageForSend(User activeUser, String messageString, int typeMessage){
+    public void fillMessageForSend(User activeUser, String messageString, int typeMessage, Expresser expresser){
         userID = activeUser.userID;
         roomID = activeUser.roomID;
         localID = Tools.generateRandomString(32);
@@ -186,6 +188,7 @@ public class Message extends BaseModel {
         status = Const.MessageStatus.SENT;
         message = messageString;
         created = System.currentTimeMillis();
+        this.expresser = expresser;
 
     }
 

@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.clover_studio.spikachatmodule.R;
+import com.clover_studio.spikachatmodule.models.Expresser;
 import com.clover_studio.spikachatmodule.models.Message;
 import com.clover_studio.spikachatmodule.models.User;
 import com.clover_studio.spikachatmodule.utils.Const;
@@ -578,7 +579,20 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<MessageRecy
         public void bindItem(int position) {
             super.bindItem(position);
             imageIV.setImageDrawable(null);
-            UtilsImage.setImageWithLoader(imageIV, -1, null, message.message);
+            // sbh
+            Expresser expresser = message.expresser;
+
+            if(expresser != null) {
+                if (expresser.isOnline) {
+                    UtilsImage.setImageWithLoader(imageIV, -1, null, message.message);
+                } else {
+                    imageIV.setImageResource(expresser.targetResource);
+                }
+            }
+            else
+            {
+                UtilsImage.setImageWithLoader(imageIV, -1, null, message.message);
+            }
         }
     }
 

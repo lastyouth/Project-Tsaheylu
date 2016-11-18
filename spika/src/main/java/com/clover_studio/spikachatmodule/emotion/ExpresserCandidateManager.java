@@ -1,20 +1,17 @@
 package com.clover_studio.spikachatmodule.emotion;
 
 import android.content.Context;
-import android.widget.LinearLayout;
 
-import com.clover_studio.spikachatmodule.models.EstimatedEmotionModel;
+import com.clover_studio.spikachatmodule.base.SingletonLikeApp;
 import com.clover_studio.spikachatmodule.models.Expresser;
 import com.clover_studio.spikachatmodule.utils.Const;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Random;
-
-import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_ANGRY;
-import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_HAPPINESS;
-import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_NEUTRAL;
-import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_SADNESS;
-import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_SURPRISE;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sbh on 2016-10-27.
@@ -22,12 +19,6 @@ import static com.clover_studio.spikachatmodule.utils.Const.Emotion.EMOTION_SURP
 public class ExpresserCandidateManager {
     static private ExpresserCandidateManager mInstance = null;
 
-    /*
-    * static public final int EMOTION_HAPPINESS = 0x00;
-    static public final int EMOTION_SADNESS = 0x01;
-    static public final int EMOTION_ANGRY = 0x02;
-    static public final int EMOTION_SURPRISE = 0x03;
-    static public final int EMOTION_NEUTRAL = 0x04;*/
     private Context mContext = null;
     private boolean mInitialized = false;
     private boolean mEmoticonReady = false;
@@ -63,7 +54,7 @@ public class ExpresserCandidateManager {
         {
             return false;
         }
-
+        saveExpressers();
         return true;
     }
 
@@ -88,14 +79,59 @@ public class ExpresserCandidateManager {
             mSurpriseExpressers.add(new Expresser());
             mHappinessExpressers.add(new Expresser());
         }
+        loadExpressers();
         mInitialized = true;
     }
 
-    public Expresser getCurrentEmotionEmoticon(EstimatedEmotionModel e)
+    private boolean loadExpressers()
     {
-        Expresser ret = null;
+        if(mContext == null)
+        {
+            return false;
+        }
+        Type type = new TypeToken<Map<Integer,ArrayList<Expresser>>>(){}.getType();
 
-        return ret;
+        Gson gson = new Gson();
+        String json = SingletonLikeApp.getInstance().getSharedPreferences(mContext).getExpressersClassification();
+
+        if(json.equals(""))
+        {
+            return false;
+        }
+
+        Map<Integer,ArrayList<Expresser>> savedData = new HashMap<Integer, ArrayList<Expresser>>();
+
+        savedData = gson.fromJson(json,type);
+
+        mHappinessExpressers = savedData.get(Const.Emotion.EMOTION_HAPPINESS);
+        mSurpriseExpressers = savedData.get(Const.Emotion.EMOTION_SURPRISE);
+        mAngryExpressers = savedData.get(Const.Emotion.EMOTION_ANGRY);
+        mNeutralExpressers = savedData.get(Const.Emotion.EMOTION_NEUTRAL);
+        mSadnessExpressers = savedData.get(Const.Emotion.EMOTION_SADNESS);
+
+        return true;
+    }
+    private boolean saveExpressers()
+    {
+        if(mContext == null)
+        {
+            return false;
+        }
+        Gson gson = new Gson();
+
+        Map<Integer,ArrayList<Expresser>> forSaving = new HashMap<Integer, ArrayList<Expresser>>();
+
+        forSaving.put(Const.Emotion.EMOTION_HAPPINESS,mHappinessExpressers);
+        forSaving.put(Const.Emotion.EMOTION_ANGRY,mAngryExpressers);
+        forSaving.put(Const.Emotion.EMOTION_NEUTRAL,mNeutralExpressers);
+        forSaving.put(Const.Emotion.EMOTION_SADNESS,mSadnessExpressers);
+        forSaving.put(Const.Emotion.EMOTION_SURPRISE,mSurpriseExpressers);
+
+        String json = gson.toJson(forSaving);
+
+        SingletonLikeApp.getInstance().getSharedPreferences(mContext).setExpressersClassification(json);
+
+        return true;
     }
 
     public ArrayList<Expresser> getExpresserList(int emotionType)

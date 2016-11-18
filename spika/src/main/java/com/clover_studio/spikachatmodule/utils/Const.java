@@ -46,7 +46,7 @@ public class Const {
         public static final String STICKERS_COUNT = "STICKERS_COUNT7";
         public static final String CACHED_DEVICE_ID ="DEVICE_ID";
         // sbh
-        public static final String STICKERS_CLASSIFICATION ="STICKERS_CLASSIFICATION";
+        public static final String EXPRESSERS_CLASSIFICATION ="EXPRESSERS_CLASSIFICATION";
     }
 
     public static final class Params{
