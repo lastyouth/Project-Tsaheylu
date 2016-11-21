@@ -44,18 +44,20 @@ public class InfoMessageDialog extends Dialog {
     private boolean showCopy;
     private boolean showDelete;
     private boolean showShare;
+    private boolean showRepeat;
 
     public static InfoMessageDialog startDialog(Context context, Message message, User activeUser, OnInfoListener listener){
-        InfoMessageDialog dialog = new InfoMessageDialog(context, message, true, true, false, listener, activeUser);
+        InfoMessageDialog dialog = new InfoMessageDialog(context, message, true, true, false,false, listener, activeUser);
         return dialog;
     }
 
-    public static InfoMessageDialog startDialogWithOptions(Context context, Message message, User activeUser, boolean showCopy, boolean showDelete, boolean showShare, OnInfoListener listener){
-        InfoMessageDialog dialog = new InfoMessageDialog(context, message, showCopy, showDelete, showShare, listener, activeUser);
+
+    public static InfoMessageDialog startDialogWithOptions(Context context, Message message, User activeUser, boolean showCopy, boolean showDelete, boolean showShare,boolean showRepeat, OnInfoListener listener){
+        InfoMessageDialog dialog = new InfoMessageDialog(context, message, showCopy, showDelete, showShare,showRepeat,listener, activeUser);
         return dialog;
     }
 
-    public InfoMessageDialog(Context context, Message message, boolean showCopy, boolean showDelete, boolean showShare, OnInfoListener listener, User activeUser) {
+    public InfoMessageDialog(Context context, Message message, boolean showCopy, boolean showDelete, boolean showShare,boolean showRepeat, OnInfoListener listener, User activeUser) {
         super(context, R.style.Theme_Dialog_no_dim);
 
         setOwnerActivity((Activity) context);
@@ -71,6 +73,7 @@ public class InfoMessageDialog extends Dialog {
         this.showCopy = showCopy;
         this.showDelete = showDelete;
         this.showShare = showShare;
+        this.showRepeat = showRepeat;
 
         show();
 
@@ -165,6 +168,35 @@ public class InfoMessageDialog extends Dialog {
             ((LinearLayout.LayoutParams)viewBelowShare.getLayoutParams()).rightMargin = padding;
 
         }
+        //add repeat text
+        if(showRepeat){
+            CustomTextView repeatTv = new CustomTextView(getContext());
+            repeatTv.setText("Repeat");
+            repeatTv.setTextSize(18);
+            repeatTv.setTextColor(ContextCompat.getColor(getContext(), R.color.devil_gray_color));
+            padding = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getContext().getResources().getDisplayMetrics());
+            repeatTv.setPadding(padding, padding, padding, padding);
+            repeatTv.setBackgroundResource(R.drawable.selector_trans_to_light_light_gray);
+            llInsideScrollView.addView(repeatTv);
+
+            View viewBelowRepeat = new View(getContext());
+            viewBelowRepeat.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.gray_light_light_color));
+            llInsideScrollView.addView(viewBelowRepeat);
+            viewBelowRepeat.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            viewBelowRepeat.getLayoutParams().height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getContext().getResources().getDisplayMetrics());
+            ((LinearLayout.LayoutParams)viewBelowRepeat.getLayoutParams()).leftMargin = padding;
+            ((LinearLayout.LayoutParams)viewBelowRepeat.getLayoutParams()).rightMargin = padding;
+
+            repeatTv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null){
+                        dismissWithRepeat();
+                    }
+                }
+            });
+
+        }
 
         CustomTextView detailsTV = new CustomTextView(getContext());
         detailsTV.setText(getContext().getString(R.string.details));
@@ -216,6 +248,19 @@ public class InfoMessageDialog extends Dialog {
             }
         });
     }
+    private void dismissWithRepeat() {
+        AnimUtils.fade(parentLayout, 1, 0, 300, new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if(listener!= null)
+                {
+                    listener.onRepeatClicked(message,InfoMessageDialog.this);
+                }
+                InfoMessageDialog.super.dismiss();
+            }
+        });
+    }
 
     @Override
     public void dismiss() {
@@ -238,6 +283,7 @@ public class InfoMessageDialog extends Dialog {
     public interface OnInfoListener{
         void onDeleteMessage(Message message, Dialog dialog);
         void onDetailsClicked(Message message, Dialog dialog);
+        void onRepeatClicked(Message message, Dialog dialog);
     }
 
 }

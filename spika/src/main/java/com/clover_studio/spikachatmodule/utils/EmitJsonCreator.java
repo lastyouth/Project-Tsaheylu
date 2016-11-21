@@ -70,6 +70,17 @@ public class EmitJsonCreator {
                 attObject.put("linkData", linkData);
                 obj.put("attributes", attObject);
             }
+            if(message.expresser != null)
+            {
+                JSONObject expresserObj = new JSONObject();
+                expresserObj.put("smallPic",message.expresser.smallPic);
+                expresserObj.put("fullPic",message.expresser.fullPic);
+                expresserObj.put("expresserType",message.expresser.expresserType);
+                expresserObj.put("isOnline",message.expresser.isOnline);
+                expresserObj.put("targetResource",message.expresser.targetResource);
+
+                obj.put("expresser",expresserObj);
+            }
             return obj;
         } catch (JSONException e) {
             e.printStackTrace();

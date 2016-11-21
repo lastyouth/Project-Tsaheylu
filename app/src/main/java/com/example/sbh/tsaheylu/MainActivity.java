@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
             rawperms.add(Manifest.permission.BLUETOOTH_ADMIN);
         }
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+            rawperms.add(Manifest.permission.VIBRATE);
+        }
         if(rawperms.size() > 0)
         {
             reqpermissions = rawperms.toArray(new String[0]);

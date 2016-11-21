@@ -82,12 +82,18 @@ public class RecyclerExpressersAdapter extends RecyclerView.Adapter<RecyclerExpr
         holder.stickerIv.setImageDrawable(null);
 
         final Expresser expresser = data.get(position);
-        if(expresser.isOnline) {
-            UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, expresser.smallPic);
+        if(!expresser.there_is_no_cow_level()) {
+            if(expresser.isOnline)
+            {
+                UtilsImage.setImageWithLoader(holder.stickerIv, -1, null, expresser.smallPic);
+            }
+            else {
+                holder.stickerIv.setImageResource(expresser.targetResource);
+            }
         }
         else
         {
-            holder.stickerIv.setImageResource(expresser.targetResource);
+            return;
         }
         holder.stickerIv.setOnClickListener(new View.OnClickListener() {
             @Override

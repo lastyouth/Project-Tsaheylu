@@ -32,7 +32,37 @@ public class EffectManager {
         final double period = mMaxDisplayX / 16.0;
         final double y_axis_parallel = mMaxDisplayX / 2.0;
         final double amplitude = mMaxDisplayX / 3.0;
+        double result = amplitude*Math.sin(period*Y) + y_axis_parallel;
+
+        int res = (int)result;
+
+        if(res > mMaxDisplayX)
+        {
+            res = mMaxDisplayX - NEXT_X_STEP_THRESHOLD;
+        }
+        return res;
+    }
+    private int cosFunction(int Y)
+    {
+        final double period = mMaxDisplayX / 16.0;
+        final double y_axis_parallel = mMaxDisplayX / 2.0;
+        final double amplitude = mMaxDisplayX / 3.0;
         double result = amplitude*Math.cos(period*Y) + y_axis_parallel;
+
+        int res = (int)result;
+
+        if(res > mMaxDisplayX)
+        {
+            res = mMaxDisplayX - NEXT_X_STEP_THRESHOLD;
+        }
+        return res;
+    }
+    private int atanFunction(int Y)
+    {
+        final double period = mMaxDisplayX / 16.0;
+        final double y_axis_parallel = mMaxDisplayX / 2.0;
+        final double amplitude = mMaxDisplayX / 3.0;
+        double result = amplitude*Math.atan(period*Y) + y_axis_parallel;
 
         int res = (int)result;
 

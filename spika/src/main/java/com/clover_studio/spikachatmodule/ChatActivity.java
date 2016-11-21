@@ -46,6 +46,7 @@ import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
+import com.clover_studio.spikachatmodule.emotion.VibrationManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManagerListener;
 import com.clover_studio.spikachatmodule.models.Attributes;
@@ -108,6 +109,7 @@ public class ChatActivity extends BaseActivity {
     private ExpressersType expressersType = ExpressersType.CLOSED;
     private TypingType typingType = TypingType.BLANK;
     private TextView newMessagesButton;
+    private VibrationManager mVibrationManager;
 
     // for candidate
     private LinearLayout mEmotionTransferInterface;
@@ -457,6 +459,9 @@ public class ChatActivity extends BaseActivity {
         Point displaySize = new Point();
         getWindowManager().getDefaultDisplay().getSize(displaySize);
         EffectManager.getInstance().initialize(this,displaySize.x,displaySize.y);
+
+        // initialize VibrationManager
+        mVibrationManager = new VibrationManager(this);
     }
 
     @Override
@@ -759,7 +764,14 @@ public class ChatActivity extends BaseActivity {
 
             boolean showShare = false;
 
-            InfoMessageDialog.startDialogWithOptions(getActivity(), item, activeUser, showCopy, showDelete, showShare, new InfoMessageDialog.OnInfoListener() {
+            boolean showRepeat = false;
+
+            if(item.expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION || item.expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT)
+            {
+                showRepeat = true;
+            }
+
+            InfoMessageDialog.startDialogWithOptions(getActivity(), item, activeUser, showCopy, showDelete, showShare,showRepeat, new InfoMessageDialog.OnInfoListener() {
                 @Override
                 public void onDeleteMessage(Message message, Dialog dialog) {
                     confirmDeleteMessage(message);
@@ -768,6 +780,19 @@ public class ChatActivity extends BaseActivity {
                 @Override
                 public void onDetailsClicked(Message message, Dialog dialog) {
                     openMessageInfoDialog(message);
+                }
+
+                @Override
+                public void onRepeatClicked(Message message, Dialog dialog) {
+                    if(message.expresser != null) {
+                        if(message.expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION)
+                        {
+                            mVibrationManager.performVibration(message.expresser);
+                        }
+                        else if(message.expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT) {
+                            EffectManager.getInstance().performEffect(message.expresser);
+                        }
+                    }
                 }
             });
 
@@ -1119,7 +1144,19 @@ public class ChatActivity extends BaseActivity {
                 {
                     EffectManager.getInstance().performEffect(expresser);
                 }
+                else if(expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION)
+                {
+                    mVibrationManager.performVibration(expresser);
+                }
             }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            //adapter.addSentMessage(sendMessage);
         }
         sentMessages.add(sendMessage.localID);
         lastVisibleItem = adapter.getItemCount();
@@ -1147,11 +1184,8 @@ public class ChatActivity extends BaseActivity {
                     if(llManager.findLastVisibleItemPosition() == rvMessages.getAdapter().getItemCount() - 1){
                         toScrollBottom = true;
                     }
-
                     adapter.addReceivedMessage(message);
-
                     // check? sbh
-
                     if(message.type == Const.MessageType.TYPE_EXPRESSER)
                     {
                         Expresser expresser = message.expresser;
@@ -1162,7 +1196,19 @@ public class ChatActivity extends BaseActivity {
                             {
                                 EffectManager.getInstance().performEffect(expresser);
                             }
+                            else if(expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION)
+                            {
+                                mVibrationManager.performVibration(expresser);
+                            }
                         }
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        //adapter.addReceivedMessage(message);
                     }
 
 
@@ -1474,13 +1520,53 @@ public class ChatActivity extends BaseActivity {
 
                 // sample effecter
 
-                Expresser effect_1 = new Expresser();
+                Expresser effectGreenStar = new Expresser();
 
-                effect_1.isOnline = false;
-                effect_1.targetResource = R.drawable.ic_green_star;
-                effect_1.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+                effectGreenStar.isOnline = false;
+                effectGreenStar.targetResource = R.drawable.ic_green_star;
+                effectGreenStar.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
 
-                mEffect.list.add(effect_1);
+                mEffect.list.add(effectGreenStar);
+
+                Expresser effectRedHeart = new Expresser();
+
+                effectRedHeart.isOnline = false;
+                effectRedHeart.targetResource = R.drawable.ic_red_heart;
+                effectRedHeart.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effectRedHeart);
+
+                Expresser effectNeutral = new Expresser();
+
+                effectNeutral.isOnline = false;
+                effectNeutral.targetResource = R.drawable.ic_pokemon_neutral;
+                effectNeutral.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effectNeutral);
+
+                Expresser effectSmile = new Expresser();
+
+                effectSmile.isOnline = false;
+                effectSmile.targetResource = R.drawable.ic_pokemon_smile;
+                effectSmile.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effectSmile);
+
+                Expresser effectFlower = new Expresser();
+
+                effectFlower.isOnline = false;
+                effectFlower.targetResource = R.drawable.ic_colorful_flower;
+                effectFlower.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effectFlower);
+
+                Expresser effectBomb = new Expresser();
+
+                effectBomb.isOnline = false;
+                effectBomb.targetResource = R.drawable.ic_bomb;
+                effectBomb.expresserType = Const.ExpresserType.EXPRESSER_EFFECT;
+
+                mEffect.list.add(effectBomb);
 
 
 
@@ -1492,6 +1578,14 @@ public class ChatActivity extends BaseActivity {
                 mVibration.isOnline = false;
                 mVibration.targetResource = R.drawable.ic_vibrate;
                 mVibration.list = new ArrayList<Expresser>();
+
+                Expresser effectVibration = new Expresser();
+
+                effectVibration.isOnline = false;
+                effectVibration.targetResource = R.drawable.ic_nuclear;
+                effectVibration.expresserType = Const.ExpresserType.EXPRESSER_VIBRATION;
+
+                mVibration.list.add(effectVibration);
 
                 mLoadedExpressersData.data.expressers.add(mEffect);
                 mLoadedExpressersData.data.expressers.add(mVibration);
