@@ -2,6 +2,7 @@ package com.clover_studio.spikachatmodule;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.FloatArrayEvaluator;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,10 +85,18 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -110,6 +120,187 @@ public class ChatActivity extends BaseActivity {
     private TypingType typingType = TypingType.BLANK;
     private TextView newMessagesButton;
     private VibrationManager mVibrationManager;
+
+    ////////////////////////// MCkang ///////////////////////////////
+    private boolean isExpereiment = false;
+
+    public static final String TAG = "TestFileActivity";
+    public static final String STRSAVEPATH = Environment.
+            getExternalStorageDirectory()+"/testfolder/";
+    public static final String STRSAVEPATH2 = Environment.
+            getExternalStorageDirectory()+"/testfolder2/";
+    public static final String SAVEFILEPATH = "MyFile.txt";
+    File dir;
+    File file;
+
+    /**
+     * 디렉토리 생성
+     * @return dir
+     */
+    private File makeDirectory(String dir_path){
+        File dir = new File(dir_path);
+        if (!dir.exists())
+        {
+            dir.mkdirs();
+            Log.i( TAG , "!dir.exists" );
+        }else{
+            Log.i( TAG , "dir.exists" );
+        }
+
+        return dir;
+    }
+
+    /**
+     * 파일 생성
+     * @param dir
+     * @return file
+     */
+    private File makeFile(File dir , String file_path){
+        File file = null;
+        boolean isSuccess = false;
+        if(dir.isDirectory()){
+            file = new File(file_path);
+            if(file!=null&&!file.exists()){
+                Log.i( TAG , "!file.exists" );
+                try {
+                    isSuccess = file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally{
+                    Log.i(TAG, "파일생성 여부 = " + isSuccess);
+                }
+            }else{
+                Log.i( TAG , "file.exists" );
+            }
+        }
+        return file;
+    }
+
+    /**
+     * (dir/file) 절대 경로 얻어오기
+     * @param file
+     * @return String
+     */
+    private String getAbsolutePath(File file){
+        return ""+file.getAbsolutePath();
+    }
+
+    /**
+     * (dir/file) 삭제 하기
+     * @param file
+     */
+    private boolean deleteFile(File file){
+        boolean result;
+        if(file!=null&&file.exists()){
+            file.delete();
+            result = true;
+        }else{
+            result = false;
+        }
+        return result;
+    }
+
+    /**
+     * 파일여부 체크 하기
+     * @param file
+     * @return
+     */
+    private boolean isFile(File file){
+        boolean result;
+        if(file!=null&&file.exists()&&file.isFile()){
+            result=true;
+        }else{
+            result=false;
+        }
+        return result;
+    }
+
+    /**
+     * 디렉토리 여부 체크 하기
+     * @param dir
+     * @return
+     */
+    private boolean isDirectory(File dir){
+        boolean result;
+        if(dir!=null&&dir.isDirectory()){
+            result=true;
+        }else{
+            result=false;
+        }
+        return result;
+    }
+
+    /**
+     * 파일 존재 여부 확인 하기
+     * @param file
+     * @return
+     */
+    private boolean isFileExist(File file){
+        boolean result;
+        if(file!=null&&file.exists()){
+            result=true;
+        }else{
+            result=false;
+        }
+        return result;
+    }
+
+    /**
+     * 파일 이름 바꾸기
+     * @param file
+     */
+    private boolean reNameFile(File file , File new_name){
+        boolean result;
+        if(file!=null&&file.exists()&&file.renameTo(new_name)){
+            result=true;
+        }else{
+            result=false;
+        }
+        return result;
+    }
+
+    /**
+     * 디렉토리에 안에 내용을 보여 준다.
+//     * @param file
+     * @return
+     */
+    private String[] getList(File dir){
+        if(dir!=null&&dir.exists())
+            return dir.list();
+        return null;
+    }
+
+    /**
+     * 파일에 내용 쓰기
+     * @param file
+     * @param file_content
+     * @return
+     */
+    private boolean writeFile(File file , byte[] file_content){
+        boolean result;
+        FileOutputStream fos;
+        if(file!=null&&file.exists()&&file_content!=null){
+            try {
+                fos = new FileOutputStream(file, true);
+                try {
+                    fos.write(file_content);
+                    fos.flush();
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            result = true;
+        }else{
+            result = false;
+        }
+        return result;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
 
     // for candidate
     private LinearLayout mEmotionTransferInterface;
@@ -164,6 +355,14 @@ public class ChatActivity extends BaseActivity {
     // sbh : recent emotion
     static private EstimatedEmotionModel mRecentEmotion = new EstimatedEmotionModel();
 
+    // jsk : additional variables
+    static private long mEmotionDurationCounter = 0;
+    static private final long DEFAULT_EMOTION_DURATION_DELAY = 2; // Delay twice
+    private int mPreviousEmotion;
+
+    private String preEmotionResult = "pre";
+
+
     // sbh : prev Facial emotion
 
     private FacialEmotionModel mPrevFacialEmotion = null;
@@ -213,48 +412,233 @@ public class ChatActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Pair<Double, String> baseResult;
+//                        Pair<Double, String> baseResult;
+                        //JesungKim 20161130
+                        Pair<Double, String> AbsoluteResult;
+                        Pair<Double, String> RelativeResult;
+
+                        String preEmotion = "pre";
+                        String newEmotion =  "new";
+
                         if(mPrevFacialEmotion != null) {
-                            baseResult = m.getScores().getBestIncrementScoredEmotionComparedWithPrevEmotion(mPrevFacialEmotion);
+                            //JesungKim 20161130
+                            RelativeResult = m.getScores().getBestIncrementScoredEmotionComparedWithPrevEmotion(mPrevFacialEmotion);
+                            AbsoluteResult = m.getScores().getBestScoredEmotion();
+                            mPreviousEmotion = Const.Emotion.EMOTION_NEUTRAL; //Reset?
                         }
                         else
                         {
-                            baseResult = m.getScores().getBestScoredEmotion();
+                            //JesungKim 20161130
+                            RelativeResult = m.getScores().getBestScoredEmotion();
+                            AbsoluteResult = m.getScores().getBestScoredEmotion();
                         }
+
                         mPrevFacialEmotion = m;
                         int classifiedemotion;
-                        String emotion = baseResult.second;
+                        //JesungKim 20161130
+                        String RelativeEmotion = RelativeResult.second;
+                        String AbsoluteEmotion = AbsoluteResult.second;
+                        String finalResult = "final";
 
-                        if (emotion.equals("happiness")) {
-                            btnEmotion.setImageResource(R.drawable.ic_happy);
-                            classifiedemotion = Const.Emotion.EMOTION_HAPPINESS;
-                        } else if (emotion.equals("surprise")) {
-                            btnEmotion.setImageResource(R.drawable.ic_surprise);
-                            classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
-                        } else if (emotion.equals("angry")) {
+                        //JesungKim 20161130
+                        if(mEmotionDurationCounter > 0) {
+                            mEmotionDurationCounter--;
+                        }
+
+                        if (RelativeEmotion.equals("happiness") || AbsoluteEmotion.equals("happiness")) {
+                            if(preEmotionResult.equals("angry")){
+                                btnEmotion.setImageResource(R.drawable.ic_shy);
+                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                finalResult = "netural";
+                            }else{
+                                btnEmotion.setImageResource(R.drawable.ic_happy);
+                                classifiedemotion = Const.Emotion.EMOTION_HAPPINESS;
+                                finalResult = "happniess";
+                            }
+                        } else if (RelativeEmotion.equals("surprise") || AbsoluteEmotion.equals("surprise")) {
+                            if(preEmotionResult.equals("angry")){
+                                btnEmotion.setImageResource(R.drawable.ic_shy);
+                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                finalResult = "netural";
+                            }else{
+                                btnEmotion.setImageResource(R.drawable.ic_surprise);
+                                classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
+                                finalResult = "suprise";
+                            }
+                        } else if (RelativeEmotion.equals("angry") || AbsoluteEmotion.equals("angry")) {
                             btnEmotion.setImageResource(R.drawable.ic_angry);
                             classifiedemotion = Const.Emotion.EMOTION_ANGRY;
-                        } else if(emotion.equals("sadness"))
-                        {
-                            btnEmotion.setImageResource(R.drawable.ic_sad);
-                            classifiedemotion = Const.Emotion.EMOTION_SADNESS;
-                        }else if (emotion.equals("neutral")) {
+                            finalResult = "angry";
+                        } else if (AbsoluteEmotion.equals("sadness") || AbsoluteEmotion.equals("sadness")) {
+                            if(preEmotionResult.equals("angry")){
+                                btnEmotion.setImageResource(R.drawable.ic_shy);
+                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                finalResult = "netural";
+                            }else{
+                                btnEmotion.setImageResource(R.drawable.ic_sad);
+                                classifiedemotion = Const.Emotion.EMOTION_SADNESS;
+                                finalResult = "sadness";
+                            }
+                        } else if (AbsoluteEmotion.equals("neutral") || AbsoluteEmotion.equals("neutral")) {
+                            //Using Current and Pre heart rate data
+                            //Compare with Average (mean) variation
+                            //Compare with Max variation
+                            //Compare with Min variation
+
+                            //Decision Tree
+                            //Increase over average
+                            //Decrease over average
+                            //Same with average
+                            if(mHSManager != null) {
+                                mHSManager.calculateAverage();
+                                mHSManager.calculateAverageOfAverageAndMinMax();
+                                mHSManager.calucateOverallAverage();
+
+                                LinkedList<Float> tempAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getAverageHR());
+                                LinkedList<Integer> tempMinHR = new LinkedList<Integer>(mHSManager.getHeartDate().getMinHR());
+                                LinkedList<Integer> tempMaxHR = new LinkedList<Integer>(mHSManager.getHeartDate().getMaxHR());
+
+                                LinkedList<Float> tempAverageOfAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getAverageOfAverageHR());
+
+                                LinkedList<Float> tempMaxOfAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getMaxOfAverageHR());
+                                LinkedList<Integer> tempHR = new LinkedList<Integer>(mHSManager.getHeartDate().getHR());
+
+                                //Max HR of average is bigger than current Input HR then Angry
+                                if (tempMaxOfAverageHR.size() != 0) {
+                                    if (preEmotionResult.equals("happniess") || preEmotionResult.equals("suprise")) {
+                                        btnEmotion.setImageResource(R.drawable.ic_shy);
+                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                        finalResult = "netural";
+                                    } else if (tempHR.getLast() > tempMaxOfAverageHR.getFirst()) {
+                                        btnEmotion.setImageResource(R.drawable.ic_angry);
+                                        classifiedemotion = Const.Emotion.EMOTION_ANGRY;
+                                        finalResult = "angry";
+                                    } else {
+                                        btnEmotion.setImageResource(R.drawable.ic_shy);
+                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                        finalResult = "netural";
+                                    }
+                                } else {
+                                    btnEmotion.setImageResource(R.drawable.ic_shy);
+                                    classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                    finalResult = "netural";
+                                }
+                            }else{
+                                btnEmotion.setImageResource(R.drawable.ic_shy);
+                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                                finalResult = "netural";
+                            }
+
+
+                            //first is old data, and last is new data
+//                            if(tempAverageHR.getFirst() < tempAverageHR.getLast()){
+//                                //compare min and max
+//                                if(tempMaxHR.getFirst() < tempMinHR.getLast()){
+//                                    //This means that new data is increased in comparsion with old data in terms of min, max, and average
+//                                    //This case the HR is increased in comparsion with 10 seconds before HR.
+//                                    //Thus, It could be anger
+//                                    //However, it could be netural when the increased HR is smaller than average (from new)
+//                                    if(tempAverageHR.getLast() > tempAverageOfAverageHR.getLast()){
+//                                        //then this emotion may be anger with high probability
+//                                        btnEmotion.setImageResource(R.drawable.ic_angry);
+//                                        classifiedemotion = Const.Emotion.EMOTION_ANGRY;
+//                                        finalResult = "angry";
+//                                    }else{
+//                                        btnEmotion.setImageResource(R.drawable.ic_shy);
+//                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//                                        finalResult = "netural";
+//                                    }
+//                                }else{
+//                                    btnEmotion.setImageResource(R.drawable.ic_shy);
+//                                    classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//                                    finalResult = "netural";
+//                                }
+//                            }else{
+//                                btnEmotion.setImageResource(R.drawable.ic_shy);
+//                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//                                finalResult = "netural";
+//                            }
+
+                        } else {
                             btnEmotion.setImageResource(R.drawable.ic_shy);
                             classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                        }else
-                        {
-                            btnEmotion.setImageResource(R.drawable.ic_shy);
-                            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                            finalResult = "netural";
                         }
 
-                        if(mHSManager !=  null)
-                        {
-                            Log.i(Const.TAG,"Queue data(HR) : "+mHSManager.getHR());
-                            Log.i(Const.TAG,"Queue data(HRV) : "+mHSManager.getHRV());
+                        //JesungKim 20161130
+                        if (mRecentEmotion.mFinalEstimatedEmotion != classifiedemotion) {
+                            mEmotionDurationCounter = DEFAULT_EMOTION_DURATION_DELAY;
                         }
+
 
                         mRecentEmotion.mFinalEstimatedEmotion = classifiedemotion;
-                        mRecentEmotion.mWeight = baseResult.first;
+                        mRecentEmotion.mWeight = RelativeResult.first;
+
+                        preEmotionResult = finalResult;
+
+                        if(mHSManager!= null){
+
+                            mHSManager.calculateAverage();
+                            mHSManager.calculateAverageOfAverageAndMinMax();
+                            mHSManager.calucateOverallAverage();
+
+                            //Compare with new data and Average of Average
+
+                            //For Log
+                            Log.i(Const.TAG,"Queue data(HR) : "+mHSManager.getHeartDate().getHR()  + " Average(HR) : " + mHSManager.getHeartDate().getAverageHR() + " Min (HR) : " +mHSManager.getHeartDate().getMinHR()
+                                    + " Max (HR) : " + mHSManager.getHeartDate().getMaxHR());
+                            Log.i(Const.TAG,"Queue data(HRV) : "+mHSManager.getHeartDate().getHRV() + " Average(HRV) : " + mHSManager.getHeartDate().getAverageHRV() + " Min (HR) : " + mHSManager.getHeartDate().getMinHRV()
+                                    + " Max (HRV) : "+ mHSManager.getHeartDate().getMaxHRV());
+
+                            Log.i(Const.TAG,"Average of average(HR) : " + mHSManager.getHeartDate().getAverageOfAverageHR()  + " Min of average(HR) : " + mHSManager.getHeartDate().getMinOfAverageHR()
+                                    + " Max of average(HR) : " + mHSManager.getHeartDate().getMaxOfAverageHR());
+                            Log.i(Const.TAG,"Average Of average(HRV) : " + mHSManager.getHeartDate().getAverageOfAverageHRV()  + " Min of average (HRV) : " + mHSManager.getHeartDate().getMinOfAverageHRV() +
+                                    " max of average (HRV) : " + mHSManager.getHeartDate().getMaxOfAverageHRV());
+
+                            String content = new String();
+                            Calendar time = Calendar.getInstance();
+                            long now = time.getTimeInMillis();
+                            content = time.getTime().toString() + "\n";
+                            writeFile(file, content.getBytes());
+                            content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult +" Relative Result : "+ RelativeEmotion + " Absolute Result : "+ AbsoluteEmotion+ "\n";
+                            writeFile(file, content.getBytes());
+                            content = "Happniness : "+ m.getScores().getHappiness() + " Suprise : " + m.getScores().getSurprise() +
+                                    " Angry : " + m.getScores().getAnger() + " Sadness "+m.getScores().getSadness() + " Neutral : "+ m.getScores().getNeutral() + "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Overall HR average : " + mHSManager.getOverallAverageHR() + " Overall HRV average : " + mHSManager.getOverallAverageHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Queue HR  : " + mHSManager.getHeartDate().getHR() + "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Average HR : " + mHSManager.getHeartDate().getAverageHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Min HR : " + mHSManager.getHeartDate().getMinHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Max HR : " + mHSManager.getHeartDate().getMaxHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Average of average HR : " + mHSManager.getHeartDate().getAverageOfAverageHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Min of average HR : " + mHSManager.getHeartDate().getMinOfAverageHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Max of average HR : " + mHSManager.getHeartDate().getMaxOfAverageHR()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            ////////////////
+                            content = "Queue HRV : " + mHSManager.getHeartDate().getHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Average HRV : " + mHSManager.getHeartDate().getAverageHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Min HRV : " + mHSManager.getHeartDate().getMinHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Max HRV : " + mHSManager.getHeartDate().getMaxHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Average of average HRV : " + mHSManager.getHeartDate().getAverageOfAverageHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Min of average HRV : " + mHSManager.getHeartDate().getMinOfAverageHRV()+ "\n";
+                            writeFile(file, content.getBytes() );
+                            content = "Max of average HRV : " + mHSManager.getHeartDate().getMaxOfAverageHRV()+ "\n\n";
+                            writeFile(file, content.getBytes() );
+
+
+                        }
                     }
                 });
             }
@@ -288,6 +672,16 @@ public class ChatActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        ///////////////////// MCkang /////////////////////////////////
+        //폴더 생성
+        dir = makeDirectory(STRSAVEPATH);
+        //파일 생성
+        file = makeFile(dir, (STRSAVEPATH+SAVEFILEPATH));
+        //절대 경로
+        Log.i(TAG, ""+getAbsolutePath(dir));
+        Log.i(TAG, ""+getAbsolutePath(file));
+        ////////////////////////////////////////////////////////////////
 
         //move this to application class of application
         Map<String, String> headers = new HashMap<>();
@@ -557,10 +951,17 @@ public class ChatActivity extends BaseActivity {
             else if(position == 1)
             {
 
-                //forceStaySocket = true;
-                Toast.makeText(getApplicationContext(),"Just In Case",Toast.LENGTH_SHORT).show();
-
-                //EffectManager.getInstance().performEffect(null);
+                if(isExpereiment == false){
+                    Toast.makeText(getApplicationContext(),"Expereiment Start",Toast.LENGTH_SHORT).show();
+                    isExpereiment = true;
+                    String content = "\n--------------------Experiment Start-------------------------\n";
+                    writeFile(file, content.getBytes());
+                }else{
+                    Toast.makeText(getApplicationContext(),"Expereiment End",Toast.LENGTH_SHORT).show();
+                    isExpereiment = false;
+                    String content = "\n--------------------Experiment End-------------------------\n";
+                    writeFile(file, content.getBytes());
+                }
 
             }
             hideSettings();
@@ -1612,3 +2013,4 @@ public class ChatActivity extends BaseActivity {
         ExpresserClassificationDialog.start(this, expresser);
     }
 }
+

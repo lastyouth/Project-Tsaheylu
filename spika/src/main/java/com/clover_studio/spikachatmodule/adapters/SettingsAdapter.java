@@ -65,7 +65,7 @@ public class SettingsAdapter extends BaseAdapter {
 	 */
 	public void setSettings() {
 		data.add(ctx.getString(R.string.users));
-		data.add("(Unimplemented)");
+		data.add("Experiment");
 		notifyDataSetChanged();
 	}
 

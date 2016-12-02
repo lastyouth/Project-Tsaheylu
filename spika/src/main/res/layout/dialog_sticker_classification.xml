@@ -33,7 +33,7 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:paddingTop="10dp"
-                android:text="Sticker Classification"
+                android:text="Expresser Classification"
                 android:textColor="@color/white"
                 android:textSize="17sp"/>
 

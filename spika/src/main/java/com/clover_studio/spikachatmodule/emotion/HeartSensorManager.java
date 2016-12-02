@@ -7,10 +7,12 @@ package com.clover_studio.spikachatmodule.emotion;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +25,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.nostra13.universalimageloader.core.assist.deque.LIFOLinkedBlockingDeque;
 
 /**
  블루트스를 연결하고 HR 또는 HRV 의 데이터를 Queue 의 데이터저장하는 클래스.
@@ -64,9 +68,159 @@ public class HeartSensorManager {
 
 
     //Queue 데이터 선언 및 크기
-    private Queue<Integer> HR;
-    private Queue<Integer> HRV;
+    private HeartData heartDate;
+    private HeartData preHeartDate;
+    private HeartData prepreHeartData;
+
+//    private LinkedList<HeartData> test;
+
     private int queueSize;
+
+    private long overallSumHR = 0;
+    private long overallSumHRV = 0;
+
+    private int overallCountHR = 0;
+    private int overallCountHRV = 0;
+
+    private float overallAverageHR = 0;
+    private float overallAverageHRV = 0;
+
+
+    public class HeartData
+    {
+        private Queue<Integer> HR;
+        private Queue<Integer> HRV;
+
+        private Queue<Integer> minHR;
+        private Queue<Integer> maxHR;
+
+        private Queue<Integer> minHRV;
+        private Queue<Integer> maxHRV;
+
+        private Queue<Float> averageHR;
+        private Queue<Float> averageHRV;
+
+        private Queue<Float> minOfAverageHR;
+        private Queue<Float> minOfAverageHRV;
+
+        private Queue<Float> maxOfAverageHR;
+        private Queue<Float> maxOfAverageHRV;
+
+        private Queue<Float> averageOfAverageHR;
+        private Queue<Float> averageOfAverageHRV;
+
+
+
+        public HeartData(){
+            HR = new LinkedList<Integer>();
+            HRV = new LinkedList<Integer>();
+
+            minHR = new LinkedList<Integer>();
+            minHRV = new LinkedList<Integer>();
+
+            maxHR = new LinkedList<Integer>();
+            maxHRV = new LinkedList<Integer>();
+
+            averageHR = new LinkedList<Float>();
+            averageHRV = new LinkedList<Float>();
+
+            averageOfAverageHR = new LinkedList<Float>();
+            averageOfAverageHRV = new LinkedList<Float>();
+
+            maxOfAverageHR = new LinkedList<Float>();
+            maxOfAverageHRV = new LinkedList<Float>();
+
+            minOfAverageHR = new LinkedList<Float>();
+            minOfAverageHRV = new LinkedList<Float>();
+
+        }
+
+
+//        private Queue<Integer> HR = new LinkedList<Integer>();
+//        private Queue<Integer> HRV = new LinkedList<Integer>();
+//
+//        private Queue<Float> averageHR = new LinkedList<Float>();
+//        private Queue<Float> averageHRV = new LinkedList<Float>();
+//
+//        private Queue<Float> meanHR = new LinkedList<Float>();
+//        private Queue<Float> meanHRV = new LinkedList<Float>();
+//
+//        private Queue<Float> maxHR = new LinkedList<Float>();
+//        private Queue<Float> maxHRV = new LinkedList<Float>();
+//
+//        private Queue<Float> minHR = new LinkedList<Float>();
+//        private Queue<Float> minHRV = new LinkedList<Float>();
+
+
+//        heartDate.HR = new LinkedList<Integer>();
+//        heartDate.HRV = new LinkedList<Integer>();
+//
+//        heartDate.averageHR = new LinkedList<Float>();
+//        heartDate.averageHRV = new LinkedList<Float>();
+//
+//        heartDate.meanHR = new LinkedList<Float>();
+//        heartDate.meanHRV = new LinkedList<Float>();
+//
+//        heartDate.minHR = new LinkedList<Float>();
+//        heartDate.minHRV = new LinkedList<Float>();
+//
+//        heartDate.maxHR = new LinkedList<Float>();
+//        heartDate.maxHRV = new LinkedList<Float>();
+
+        //데이터를 Get method
+        public Queue<Integer> getHR(){
+            return HR;
+        }
+
+        public Queue<Integer> getHRV(){
+            return HRV;
+        }
+
+        public Queue<Integer> getMinHR() { return minHR; }
+
+        public Queue<Integer> getMinHRV() { return minHRV; }
+
+        public Queue<Integer> getMaxHR() { return maxHR; }
+
+        public Queue<Integer> getMaxHRV() { return  maxHRV; }
+
+        public Queue<Float> getAverageHR(){ return averageHR; }
+
+        public Queue<Float> getAverageHRV(){ return averageHRV; }
+
+        public Queue<Float> getAverageOfAverageHR() { return averageOfAverageHR; }
+
+        public Queue<Float> getAverageOfAverageHRV() { return  averageOfAverageHRV; }
+
+        public Queue<Float> getMinOfAverageHR() { return minOfAverageHR; }
+
+        public Queue<Float> getMinOfAverageHRV() { return  minOfAverageHRV; }
+
+        public Queue<Float> getMaxOfAverageHR() { return maxOfAverageHR; }
+
+        public Queue<Float> getMaxOfAverageHRV() { return  maxOfAverageHRV; }
+
+    }
+
+
+
+    //mcKang
+//    private Queue<Integer> HR;
+//    private Queue<Integer> HRV;
+//    //Average
+//    private Queue<Float> averageHR ;
+//    private Queue<Float> averageHRV;
+//
+//    private Queue<Float> meanHR;
+//    private Queue<Float> meanHRV;
+//
+//    private Queue<Float> maxHR;
+//    private Queue<Float> maxHRV;
+//
+//    private Queue<Float> minHR;
+//    private Queue<Float> minHRV;
+
+
 
 
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -86,10 +240,30 @@ public class HeartSensorManager {
         mContext = context;
         mAllowInsecureConnections = true;
         receivedString= new ArrayList<String>();
-        HR = new LinkedList<Integer>();
-        HRV = new LinkedList<Integer>();
+
 
         this.queueSize = queueSize;
+
+        heartDate = new HeartData();
+
+//        test = new LinkedList<HeartData>();
+
+
+
+//        HR = new LinkedList<Integer>();
+//        HRV = new LinkedList<Integer>();
+//
+//        averageHR = new LinkedList<Float>();
+//        averageHRV = new LinkedList<Float>();
+//
+//        meanHR = new LinkedList<Float>();
+//        meanHRV = new LinkedList<Float>();
+//
+//        minHR = new LinkedList<Float>();
+//        minHRV = new LinkedList<Float>();
+//
+//        maxHR = new LinkedList<Float>();
+//        maxHRV = new LinkedList<Float>();
 
     }
 
@@ -380,12 +554,19 @@ public class HeartSensorManager {
                                 tempHRToString = tempHRToString.trim();
                                 int tempHR  = Integer.parseInt(tempHRToString);
 
-//                                System.out.println(" HR : "+tempHR );
-                                if(HR.size() > queueSize){
-                                    HR.remove();
-                                    HR.offer(tempHR);
-                                }else{
-                                    HR.offer(tempHR);
+                                // System.out.println(" HR : "+tempHR );
+                                if(tempHR <= 150){
+
+                                    overallSumHR += tempHR;
+                                    overallCountHR++;
+
+                                    if(heartDate.getHR().size() >= queueSize){
+                                        heartDate.getHR().remove();
+                                        heartDate.getHR().offer(tempHR);
+                                    }else{
+                                        heartDate.getHR().offer(tempHR);
+                                    }
+
                                 }
 
                             }
@@ -402,11 +583,17 @@ public class HeartSensorManager {
                                 tempHRVToString = tempHRVToString.trim();
                                 int tempHRV = Integer.parseInt(tempHRVToString);
 //                               System.out.println(" HRV : "+ tempHRV );
-                                if(HRV.size() > queueSize){
-                                    HRV.remove();
-                                    HRV.offer(tempHRV);
-                                }else{
-                                    HRV.offer(tempHRV);
+                                if(tempHRV >= 500) {
+
+                                    overallSumHRV += tempHRV;
+                                    overallCountHRV++;
+
+                                    if (heartDate.getHRV().size() >= queueSize) {
+                                        heartDate.getHRV().remove();
+                                        heartDate.getHRV().offer(tempHRV);
+                                    } else {
+                                        heartDate.getHRV().offer(tempHRV);
+                                    }
                                 }
 
                             }
@@ -452,12 +639,7 @@ public class HeartSensorManager {
             System.out.println(receivedString.get(i));
         }
     }
-    //For debug
-    public void printHR(){
-        for(int i= 0; i< HR.size(); i++){
-//            System.out.println(HR.)
-        }
-    }
+
     public void disconnect()
     {
         if(mConnectedThread != null) {
@@ -465,13 +647,234 @@ public class HeartSensorManager {
         }
     }
 
-    //데이터를 Get method
-    public Queue<Integer> getHR(){
-        return HR;
+
+    public void calucateOverallAverage(){
+
+        if(overallCountHR!=0){
+            overallAverageHR = (float)overallSumHR / (float)overallCountHR;
+        }
+        if(overallCountHRV !=0){
+            overallAverageHRV = (float)overallSumHRV / (float)overallCountHRV;
+        }
     }
 
-    public Queue<Integer> getHRV(){
-        return HRV;
+
+
+    public void calculateAverage(){
+        int sumOfHR = 0;
+        int sumOfHRV = 0;
+        float tempAverageHR = 0;
+        float tempAverageHRV = 0;
+
+        int tempMinHR = 1000;
+        int tempMaxHR = 0;
+        int tempMinHRV = 1000;
+        int tempMaxHRV = 0;
+
+        if(heartDate.getHR().size() == 0|| heartDate.getHRV().size() == 0){
+            return;
+        }
+
+        ArrayList<Integer> tempHR = new ArrayList<Integer>(heartDate.getHR());
+        ArrayList<Integer> tempHRV = new ArrayList<Integer>(heartDate.getHRV());
+
+        for(int i= 0; i< heartDate.getHR().size();i++){
+            sumOfHR  += tempHR.get(i);
+            //Find max
+            if(tempMaxHR < tempHR.get(i)){
+                tempMaxHR = tempHR.get(i);
+            }
+
+            //Find Min
+            if(tempMinHR > tempHR.get(i)){
+                tempMinHR = tempHR.get(i);
+            }
+
+        }
+
+        for(int i= 0; i< heartDate.getHRV().size();i++){
+            sumOfHRV += tempHRV.get(i);
+
+            if(tempMaxHRV < tempHRV.get(i)){
+                tempMaxHRV = tempHRV.get(i);
+            }
+
+            if(tempMinHRV > tempHRV.get(i)){
+                tempMinHRV= tempHRV.get(i);
+            }
+
+        }
+
+        tempAverageHR = (float) sumOfHR / (float)queueSize;
+        tempAverageHRV = (float) sumOfHRV / (float)queueSize;
+
+        if(heartDate.getAverageHR().size() >= queueSize){
+            heartDate.getAverageHR().remove();
+            heartDate.getAverageHR().offer(tempAverageHR);
+        }else{
+            heartDate.getAverageHR().offer(tempAverageHR);
+        }
+
+        if(heartDate.getMinHR().size() >= queueSize){
+            heartDate.getMinHR().remove();
+            heartDate.getMinHR().offer(tempMinHR);
+        }else{
+            heartDate.getMinHR().offer(tempMinHR);
+        }
+
+        if(heartDate.getMaxHR().size() >= queueSize){
+            heartDate.getMaxHR().remove();
+            heartDate.getMaxHR().offer(tempMaxHR);
+        }else{
+            heartDate.getMaxHR().offer(tempMaxHR);
+        }
+
+
+        if(heartDate.getAverageHRV().size() >= queueSize){
+            heartDate.getAverageHRV().remove();
+            heartDate.getAverageHRV().offer(tempAverageHRV);
+        }else{
+            heartDate.getAverageHRV().offer(tempAverageHRV);
+        }
+
+        if(heartDate.getMinHRV().size() >= queueSize){
+            heartDate.getMinHRV().remove();
+            heartDate.getMinHRV().offer(tempMinHRV);
+        }else{
+            heartDate.getMinHRV().offer(tempMinHRV);
+        }
+
+        if(heartDate.getMaxHRV().size() >= queueSize){
+            heartDate.getMaxHRV().remove();
+            heartDate.getMaxHRV().offer(tempMaxHRV);
+        }else{
+            heartDate.getMaxHRV().offer(tempMaxHRV);
+        }
     }
+
+    public void calculateAverageOfAverageAndMinMax(){
+
+        if(heartDate.getAverageHR().size() == queueSize){
+
+            float tempSumHR = 0;
+            float tempAverageHR = 0;
+            float tempMinHR = 1000;
+            float tempMaxHR = 0;
+            ArrayList<Float> tempAverageListHR = new ArrayList<Float>(heartDate.getAverageHR());
+
+            float tempSumHRV = 0;
+            float tempAverageHRV = 0;
+            float tempMinHRV = 1000;
+            float tempMaxHRV = 0;
+            ArrayList<Float> tempAverageListHRV = new ArrayList<Float>(heartDate.getAverageHRV());
+
+            for(int i = 0; i < queueSize; i++){
+                tempSumHR += tempAverageListHR.get(i);
+                tempSumHRV += tempAverageListHRV.get(i);
+
+                //Find max
+                if(tempMaxHR < tempAverageListHR.get(i)){
+                    tempMaxHR = tempAverageListHR.get(i);
+                }
+                if(tempMaxHRV < tempAverageListHR.get(i)){
+                    tempMaxHRV = tempAverageListHRV.get(i);
+                }
+
+                //Find Min
+                if(tempMinHR > tempAverageListHR.get(i)){
+                    tempMinHR = tempAverageListHR.get(i);
+                }
+                if(tempMinHRV > tempAverageListHR.get(i)){
+                    tempMinHRV= tempAverageListHRV.get(i);
+                }
+            }
+
+            //calculate average
+            tempAverageHR = tempSumHR / (float) queueSize;
+            tempAverageHRV = tempSumHRV / (float) queueSize;
+
+            //Insert average to Queue
+            if(heartDate.getAverageOfAverageHR().size() >= queueSize){
+                heartDate.getAverageOfAverageHR().remove();
+                heartDate.getAverageOfAverageHR().offer(tempAverageHR);
+            }else{
+                heartDate.getAverageOfAverageHR().offer(tempAverageHR);
+            }
+
+            if(heartDate.getAverageOfAverageHRV().size() >= queueSize){
+                heartDate.getAverageOfAverageHRV().remove();
+                heartDate.getAverageOfAverageHRV().offer(tempAverageHRV);
+            }else{
+                heartDate.getAverageOfAverageHRV().offer(tempAverageHRV);
+            }
+            //Insert min to queue
+            if(heartDate.getMinOfAverageHR().size() >= queueSize){
+                heartDate.getMinOfAverageHR().remove();
+                heartDate.getMinOfAverageHR().offer(tempMinHR);
+            }else{
+                heartDate.getMinOfAverageHR().offer(tempMinHR);
+            }
+
+            if(heartDate.getMinOfAverageHRV().size() >= queueSize){
+                heartDate.getMinOfAverageHRV().remove();
+                heartDate.getMinOfAverageHRV().offer(tempMinHRV);
+            }else{
+                heartDate.getMinOfAverageHRV().offer(tempMinHRV);
+            }
+            //Insert max to queue
+            if(heartDate.getMaxOfAverageHR().size() >= queueSize){
+                heartDate.getMaxOfAverageHR().remove();
+                heartDate.getMaxOfAverageHR().offer(tempMaxHR);
+            }else{
+                heartDate.getMaxOfAverageHR().offer(tempMaxHR);
+            }
+
+            if(heartDate.getMaxOfAverageHRV().size() >= queueSize){
+                heartDate.getMaxOfAverageHRV().remove();
+                heartDate.getMaxOfAverageHRV().offer(tempMaxHRV);
+            }else{
+                heartDate.getMaxOfAverageHRV().offer(tempMaxHRV);
+            }
+
+        }else{
+            return;
+        }
+
+    }
+
+
+
+    public ArrayList<String> getStringFromData( Queue<Objects> data ){
+        ArrayList<String> tempString = new ArrayList<String>();
+        ArrayList<Objects> tempData =  new ArrayList<Objects>(data);
+
+        for(int i = 0; i < data.size(); i++){
+            tempString.add(tempData.get(i).toString());
+        }
+
+        return tempString;
+    }
+
+    public float getOverallAverageHR(){ return overallAverageHR;}
+
+    public float getOverallAverageHRV(){ return overallAverageHRV; }
+
+    public int getQueueSize(){ return queueSize; }
+
+    public HeartData getHeartDate(){ return heartDate;}
+
+    public void setHeartDate(HeartData heartDate){ this.heartDate = heartDate;}
+
+    public HeartData getPreHeartDate(){ return preHeartDate;}
+
+    public void getPreHeartDate(HeartData heartDate){ this.preHeartDate= heartDate;}
+
+    public HeartData getPrePreHeartDate(){ return prepreHeartData;}
+
+    public void setPrePreHeartDate(HeartData heartDate){ this.prepreHeartData= heartDate;}
+
+
+
+
 
 }
