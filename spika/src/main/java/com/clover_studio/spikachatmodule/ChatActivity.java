@@ -560,7 +560,7 @@ public class ChatActivity extends BaseActivity {
                 //forceStaySocket = true;
                 Toast.makeText(getApplicationContext(),"Just In Case",Toast.LENGTH_SHORT).show();
 
-                EffectManager.getInstance().performEffect(null);
+                //EffectManager.getInstance().performEffect(null);
 
             }
             hideSettings();
