@@ -70,6 +70,7 @@ public class SettingsAdapter extends BaseAdapter {
 		data.add("Surprise");
 		data.add("Sadness");
 		data.add("Neutral");
+		data.add("Perf Checking");
 		notifyDataSetChanged();
 	}
 

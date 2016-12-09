@@ -48,6 +48,8 @@ import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
+import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManager;
+import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManagerListener;
 import com.clover_studio.spikachatmodule.emotion.VibrationManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManager;
 import com.clover_studio.spikachatmodule.managers.socket.SocketManagerListener;
@@ -679,6 +681,50 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
+    // for checking performance
+    private PerformanceCheckManager mPCManager = null;
+    private PerformanceCheckManagerListener mPCMListener = new PerformanceCheckManagerListener() {
+        @Override
+        public void checkStart(String emotion) {
+            final Message message = new Message();
+            String data = new String();
+
+            data = String.format("다음 감정을 떠올리고 표현해주세요 : %s",emotion);
+            message.fillMessageForSend(activeUser, data, Const.MessageType.TYPE_TEXT,null);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(SocketManager.getInstance().isSocketConnect()){
+                        JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
+                        SocketManager.getInstance().emitMessage(Const.EmitKeyWord.SEND_MESSAGE, emitMessage);
+                        onMessageSent(message);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void checkEnd(String time, String emotion) {
+            final Message message = new Message();
+            String data = new String();
+
+            data = String.format("%s 님이 '%s' 감정을 표현하기까지 걸린 시간 %s",activeUser.name,emotion,time);
+            message.fillMessageForSend(activeUser, data, Const.MessageType.TYPE_TEXT,null);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(SocketManager.getInstance().isSocketConnect()){
+                        JSONObject emitMessage = EmitJsonCreator.createEmitSendMessage(message);
+                        SocketManager.getInstance().emitMessage(Const.EmitKeyWord.SEND_MESSAGE, emitMessage);
+                        onMessageSent(message);
+                    }
+                }
+            });
+
+        }
+    };
+
     /**
      * start chat activity with user data
      *
@@ -1163,6 +1209,9 @@ public class ChatActivity extends BaseActivity {
                     writeFile(finalFile, content.getBytes());
                     writeFile(rawFile, content.getBytes());
                 }
+            }else if(position == 6) {
+                Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
+                mPCManager = new PerformanceCheckManager(mPCMListener);
             }
             hideSettings();
         }
@@ -1754,11 +1803,13 @@ public class ChatActivity extends BaseActivity {
             {
 
             }
+            if(mPCManager != null)
+            {
+                mPCManager.checkEndInternal();
+                mPCManager = null;
+            }
         }
-        else
-        {
-            //adapter.addSentMessage(sendMessage);
-        }
+
         sentMessages.add(sendMessage.localID);
         lastVisibleItem = adapter.getItemCount();
         scrollRecyclerToBottom();
