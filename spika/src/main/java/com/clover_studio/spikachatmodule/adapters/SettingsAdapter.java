@@ -69,6 +69,7 @@ public class SettingsAdapter extends BaseAdapter {
 		data.add("Anger");
 		data.add("Surprise");
 		data.add("Sadness");
+		data.add("Neutral");
 		notifyDataSetChanged();
 	}
 

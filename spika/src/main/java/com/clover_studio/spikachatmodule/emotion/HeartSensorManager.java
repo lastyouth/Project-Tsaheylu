@@ -79,11 +79,16 @@ public class HeartSensorManager {
     private long overallSumHR = 0;
     private long overallSumHRV = 0;
 
+    private long preOverallSumHR = 0;
+    private long preOverallSumHRV = 0;
+
     private int overallCountHR = 0;
     private int overallCountHRV = 0;
 
     private float overallAverageHR = 0;
     private float overallAverageHRV = 0;
+
+    public boolean availableFlag = false;
 
 
     public class HeartData
@@ -554,8 +559,10 @@ public class HeartSensorManager {
                                 tempHRToString = tempHRToString.trim();
                                 int tempHR  = Integer.parseInt(tempHRToString);
 
-                                // System.out.println(" HR : "+tempHR );
-                                if(tempHR <= 150){
+//                                 System.out.println("(Test) HR : "+tempHR );
+                                if(tempHR <= 150 && tempHR >= 50){
+
+//                                    preOverallSumHR = overallSumHR;
 
                                     overallSumHR += tempHR;
                                     overallCountHR++;
@@ -571,7 +578,7 @@ public class HeartSensorManager {
 
                             }
 //                            else{
-//                                System.out.println("Failed Value B: "+ value + " byte : "+ bytes);
+//                                System.out.println("(Test) Failed Value B: "+ value + " byte : "+ bytes);
 //                            }
 
                         }
@@ -582,8 +589,10 @@ public class HeartSensorManager {
                                 String tempHRVToString = value.substring(i+1,i+4);
                                 tempHRVToString = tempHRVToString.trim();
                                 int tempHRV = Integer.parseInt(tempHRVToString);
-//                               System.out.println(" HRV : "+ tempHRV );
+//                               System.out.println("(Test) HRV : "+ tempHRV );
                                 if(tempHRV >= 500) {
+
+//                                    preOverallSumHRV = overallSumHRV;
 
                                     overallSumHRV += tempHRV;
                                     overallCountHRV++;
@@ -598,7 +607,7 @@ public class HeartSensorManager {
 
                             }
 //                            else{
-//                                System.out.println("Failed Value Q:"+ value + " byte : "+ bytes);
+//                                System.out.println("(Test) Failed Value Q:"+ value + " byte : "+ bytes);
 //                            }
                         }
                     }
@@ -671,7 +680,12 @@ public class HeartSensorManager {
         int tempMinHRV = 1000;
         int tempMaxHRV = 0;
 
-        if(heartDate.getHR().size() == 0|| heartDate.getHRV().size() == 0){
+
+
+        if(heartDate.getHR().size() == 0 || heartDate.getHRV().size() == 0){
+            return;
+        }
+        if (preOverallSumHR == overallSumHR || preOverallSumHRV == overallSumHRV) {
             return;
         }
 
@@ -705,8 +719,8 @@ public class HeartSensorManager {
 
         }
 
-        tempAverageHR = (float) sumOfHR / (float)queueSize;
-        tempAverageHRV = (float) sumOfHRV / (float)queueSize;
+        tempAverageHR = (float) sumOfHR / (float)heartDate.getHR().size();
+        tempAverageHRV = (float) sumOfHRV / (float)heartDate.getHRV().size();
 
         if(heartDate.getAverageHR().size() >= queueSize){
             heartDate.getAverageHR().remove();
@@ -750,11 +764,17 @@ public class HeartSensorManager {
         }else{
             heartDate.getMaxHRV().offer(tempMaxHRV);
         }
+
+        preOverallSumHR = overallSumHR;
+        preOverallSumHRV = overallSumHRV;
+
+
     }
 
     public void calculateAverageOfAverageAndMinMax(){
 
         if(heartDate.getAverageHR().size() == queueSize){
+
 
             float tempSumHR = 0;
             float tempAverageHR = 0;
@@ -836,6 +856,12 @@ public class HeartSensorManager {
                 heartDate.getMaxOfAverageHRV().offer(tempMaxHRV);
             }
 
+            if(availableFlag == false){
+                Toast.makeText(mContext.getApplicationContext(),"The HR data is available !!!!",Toast.LENGTH_SHORT).show();
+                availableFlag = true;
+            }
+
+
         }else{
             return;
         }
@@ -872,6 +898,36 @@ public class HeartSensorManager {
     public HeartData getPrePreHeartDate(){ return prepreHeartData;}
 
     public void setPrePreHeartDate(HeartData heartDate){ this.prepreHeartData= heartDate;}
+
+    public void clearQueue(){
+
+        this.heartDate.getHR().clear();
+        this.heartDate.getHRV().clear();
+        this.heartDate.getAverageHR().clear();
+        this.heartDate.getAverageHRV().clear();
+        this.heartDate.getMinHR().clear();
+        this.heartDate.getMinHRV().clear();
+        this.heartDate.getMaxHR().clear();
+        this.heartDate.getMaxHRV().clear();
+
+        this.heartDate.getAverageOfAverageHR().clear();
+        this.heartDate.getAverageOfAverageHRV().clear();
+        this.heartDate.getMaxOfAverageHR().clear();
+        this.heartDate.getMaxOfAverageHRV().clear();
+        this.heartDate.getMinOfAverageHR().clear();
+        this.heartDate.getMinOfAverageHRV().clear();
+
+        availableFlag = false;
+
+        overallCountHR = 0;
+        overallCountHRV = 0;
+        overallSumHR = 0;
+        overallSumHRV = 0;
+        preOverallSumHR = 0;
+        preOverallSumHRV = 0;
+
+    }
+
 
 
 

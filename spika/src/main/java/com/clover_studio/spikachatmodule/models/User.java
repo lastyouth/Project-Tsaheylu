@@ -84,4 +84,9 @@ public class User extends BaseModel implements Parcelable{
             return new User[size];
         }
     };
+
+    public String getUserID(){ return userID; }
+
+    public String getRoomID(){ return roomID; }
+
 }
