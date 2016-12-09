@@ -124,14 +124,14 @@ public class ChatActivity extends BaseActivity {
     ////////////////////////// MCkang ///////////////////////////////
     private boolean isExperiment = false;
 
-    public static final String TAG = "TestFileActivity";
-    public static final String STRSAVEPATH = Environment.
-            getExternalStorageDirectory()+"/testfolder/";
-    public static final String STRSAVEPATH2 = Environment.
-            getExternalStorageDirectory()+"/testfolder2/";
-    public static final String SAVEFILEPATH = "MyFile.txt";
+    public static String TAG = "Log_File";
+    public static String STRSAVEPATH = Environment.getExternalStorageDirectory()+"/LogFolder/";
+
+    public static String SAVEFILEPATH = "FinalResult.txt";
+    public static String SAVEFILEPATH2 = "RawResult.txt";
     File dir;
-    File file;
+    File finalFile;
+    File rawFile;
 
     /**
      * 디렉토리 생성
@@ -364,7 +364,7 @@ public class ChatActivity extends BaseActivity {
 
     private int happinessCount = 0;
     private int angerCount = 0;
-    private int supriseCount = 0 ;
+    private int surpriseCount = 0 ;
     private int sadnessCount = 0;
     private int neutralCount = 0;
 
@@ -469,7 +469,7 @@ public class ChatActivity extends BaseActivity {
                             }else{
                                 btnEmotion.setImageResource(R.drawable.ic_surprise);
                                 classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
-                                finalResult = "suprise";
+                                finalResult = "surprise";
                             }
                         } else if (RelativeEmotion.equals("angry") || AbsoluteEmotion.equals("angry")) {
                             btnEmotion.setImageResource(R.drawable.ic_angry);
@@ -511,7 +511,7 @@ public class ChatActivity extends BaseActivity {
 
                                 //Max HR of average is bigger than current Input HR then Angry
                                 if (tempMaxOfAverageHR.size() != 0) {
-                                    if (preEmotionResult.equals("happniess") || preEmotionResult.equals("suprise")) {
+                                    if (preEmotionResult.equals("happiness") || preEmotionResult.equals("surprise")) {
                                         btnEmotion.setImageResource(R.drawable.ic_shy);
                                         classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
                                         finalResult = "neutral";
@@ -604,44 +604,50 @@ public class ChatActivity extends BaseActivity {
                             String content = new String();
                             Calendar time = Calendar.getInstance();
                             long now = time.getTimeInMillis();
-                            content = time.getTime().toString() + "\n";
-                            writeFile(file, content.getBytes());
-                            content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult +" Relative Result : "+ RelativeEmotion + " Absolute Result : "+ AbsoluteEmotion+ "\n";
-                            writeFile(file, content.getBytes());
-                            content = "Happniness : "+ m.getScores().getHappiness() + " Suprise : " + m.getScores().getSurprise() +
-                                    " Angry : " + m.getScores().getAnger() + " Sadness "+m.getScores().getSadness() + " Neutral : "+ m.getScores().getNeutral() + "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Overall HR average : " + mHSManager.getOverallAverageHR() + " Overall HRV average : " + mHSManager.getOverallAverageHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Queue HR  : " + mHSManager.getHeartDate().getHR() + "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Average HR : " + mHSManager.getHeartDate().getAverageHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Min HR : " + mHSManager.getHeartDate().getMinHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Max HR : " + mHSManager.getHeartDate().getMaxHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Average of average HR : " + mHSManager.getHeartDate().getAverageOfAverageHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Min of average HR : " + mHSManager.getHeartDate().getMinOfAverageHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Max of average HR : " + mHSManager.getHeartDate().getMaxOfAverageHR()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            ////////////////
-                            content = "Queue HRV : " + mHSManager.getHeartDate().getHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Average HRV : " + mHSManager.getHeartDate().getAverageHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Min HRV : " + mHSManager.getHeartDate().getMinHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Max HRV : " + mHSManager.getHeartDate().getMaxHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Average of average HRV : " + mHSManager.getHeartDate().getAverageOfAverageHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Min of average HRV : " + mHSManager.getHeartDate().getMinOfAverageHRV()+ "\n";
-                            writeFile(file, content.getBytes() );
-                            content = "Max of average HRV : " + mHSManager.getHeartDate().getMaxOfAverageHRV()+ "\n\n";
-                            writeFile(file, content.getBytes() );
+
+                            if(isExperiment==true) {
+
+                                content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
+                                        " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Overall HR average : " + mHSManager.getOverallAverageHR() + " Overall HRV average : " + mHSManager.getOverallAverageHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Queue HR  : " + mHSManager.getHeartDate().getHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Average HR : " + mHSManager.getHeartDate().getAverageHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Min HR : " + mHSManager.getHeartDate().getMinHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Max HR : " + mHSManager.getHeartDate().getMaxHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Average of average HR : " + mHSManager.getHeartDate().getAverageOfAverageHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Min of average HR : " + mHSManager.getHeartDate().getMinOfAverageHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Max of average HR : " + mHSManager.getHeartDate().getMaxOfAverageHR() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                ////////////////
+                                content = "Queue HRV : " + mHSManager.getHeartDate().getHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Average HRV : " + mHSManager.getHeartDate().getAverageHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Min HRV : " + mHSManager.getHeartDate().getMinHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Max HRV : " + mHSManager.getHeartDate().getMaxHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Average of average HRV : " + mHSManager.getHeartDate().getAverageOfAverageHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Min of average HRV : " + mHSManager.getHeartDate().getMinOfAverageHRV() + "\n";
+                                writeFile(rawFile, content.getBytes());
+                                content = "Max of average HRV : " + mHSManager.getHeartDate().getMaxOfAverageHRV() + "\n\n";
+                                writeFile(rawFile, content.getBytes());
+
+                            }
+
 
 
                         }
@@ -649,16 +655,19 @@ public class ChatActivity extends BaseActivity {
                         preEmotionResult = finalResult;
 
                         //Count!
-                        if(finalResult.equals("happiness")){
-                            happinessCount++;
-                        }else if(finalResult.equals("angry")){
-                            angerCount++;
-                        }else if(finalResult.equals("suprise")){
-                            supriseCount++;
-                        }else if(finalResult.equals("sadness")){
-                            sadnessCount++;
-                        }else if(finalResult.equals("neutral")){
-                            neutralCount++;
+                        if(mHSManager.availableFlag == true) {
+
+                            if (finalResult.equals("happiness")) {
+                                happinessCount++;
+                            } else if (finalResult.equals("angry")) {
+                                angerCount++;
+                            } else if (finalResult.equals("surprise")) {
+                                surpriseCount++;
+                            } else if (finalResult.equals("sadness")) {
+                                sadnessCount++;
+                            } else if (finalResult.equals("neutral")) {
+                                neutralCount++;
+                            }
                         }
                     }
                 });
@@ -694,15 +703,7 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        ///////////////////// MCkang /////////////////////////////////
-        //폴더 생성
-        dir = makeDirectory(STRSAVEPATH);
-        //파일 생성
-        file = makeFile(dir, (STRSAVEPATH+SAVEFILEPATH));
-        //절대 경로
-        Log.i(TAG, ""+getAbsolutePath(dir));
-        Log.i(TAG, ""+getAbsolutePath(file));
-        ////////////////////////////////////////////////////////////////
+
 
         //move this to application class of application
         Map<String, String> headers = new HashMap<>();
@@ -877,6 +878,31 @@ public class ChatActivity extends BaseActivity {
 
         // initialize VibrationManager
         mVibrationManager = new VibrationManager(this);
+
+        activeUser.toString();
+        System.out.println("User ID Test : " + activeUser.getUserID());
+        System.out.println("Room ID Test : "+ activeUser.getRoomID());
+
+        ///////////////////// MCkang /////////////////////////////////
+        //폴더 생성
+        dir = makeDirectory(STRSAVEPATH);
+        //파일 생성
+
+//        activeUser.toString();
+//        System.out.println("User ID Test : " + activeUser.getUserID());
+//        System.out.println("Room ID Test : "+ activeUser.getRoomID());
+
+        finalFile = makeFile(dir, (STRSAVEPATH+activeUser.roomID+"_"+SAVEFILEPATH));
+        rawFile = makeFile(dir, (STRSAVEPATH+activeUser.roomID+"_"+SAVEFILEPATH2));
+        //절대 경로
+
+        Log.i(TAG, ""+getAbsolutePath(dir));
+        Log.i(TAG, ""+getAbsolutePath(finalFile));
+        Log.i(TAG, ""+getAbsolutePath(dir));
+        Log.i(TAG, ""+getAbsolutePath(rawFile));
+        ////////////////////////////////////////////////////////////////
+
+
     }
 
     @Override
@@ -969,6 +995,8 @@ public class ChatActivity extends BaseActivity {
 //            data.add("Anger");
 //            data.add("Surprise");
 //            data.add("Sadness");
+//            data.add("Neutral");
+
 
 
             if (position == 0) {
@@ -982,24 +1010,31 @@ public class ChatActivity extends BaseActivity {
                 if(isExperiment == false){
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
-                    content = "\n--------------------Experiment (Happniess) Start-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+                    String content = "\n--------------------Experiment (Happiness) Start-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+
 
                     happinessCount = 0;
                     angerCount = 0;
-                    supriseCount = 0;
+                    surpriseCount = 0;
                     sadnessCount = 0;
                     neutralCount = 0;
+
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
+                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                     content = "\n--------------------Experiment (Happiness) End-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                 }
 
             }else if(position == 2){
@@ -1007,50 +1042,64 @@ public class ChatActivity extends BaseActivity {
                 if(isExperiment == false){
                     Toast.makeText(getApplicationContext(),"Experiment (Anger) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
-                    content = "\n--------------------Experiment (Anger) Start-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+
+                    String content = "\n--------------------Experiment (Anger) Start-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
 
                     happinessCount = 0;
                     angerCount = 0;
-                    supriseCount = 0;
+                    surpriseCount = 0;
                     sadnessCount = 0;
                     neutralCount = 0;
+
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Anger) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
+                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                     content = "\n--------------------Experiment (Anger) End-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                 }
 
 
             }else if(position == 3){
 
                 if(isExperiment == false){
-                    Toast.makeText(getApplicationContext(),"Experiment (Suprise) Start",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Experiment (Surprise) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
-                    content = "\n--------------------Experiment (Suprise) Start-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+
+                    String  content = "\n--------------------Experiment (Surprise) Start-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
 
                     happinessCount = 0;
                     angerCount = 0;
-                    supriseCount = 0;
+                    surpriseCount = 0;
                     sadnessCount = 0;
                     neutralCount = 0;
 
+                    mHSManager.clearQueue();
+
                 }else{
-                    Toast.makeText(getApplicationContext(),"Experiment (Suprise) End",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Experiment (Surprise) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
-                    content = "\n--------------------Experiment (Suprise) End-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\n--------------------Experiment (Surprise) End-------------------------\n\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                 }
 
             }else if(position ==4){
@@ -1058,26 +1107,63 @@ public class ChatActivity extends BaseActivity {
                 if(isExperiment == false){
                     Toast.makeText(getApplicationContext(),"Experiment (Sadness) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
-                    content = "\n--------------------Experiment (Sadness) Start-------------------------\n\n";
-                    writeFile(file, content.getBytes());
+
+                    String  content = "\n--------------------Experiment (Sadness) Start-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
 
                     happinessCount = 0;
                     angerCount = 0;
-                    supriseCount = 0;
+                    surpriseCount = 0;
                     sadnessCount = 0;
                     neutralCount = 0;
+
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Sadness) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(file, content.getBytes());
+                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                     content = "\n--------------------Experiment (Sadness) End-------------------------\n";
-                    writeFile(file, content.getBytes());
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
                 }
 
+            }else if(position == 5){
+                if(isExperiment == false){
+                    Toast.makeText(getApplicationContext(),"Experiment (Neutral) Start",Toast.LENGTH_SHORT).show();
+                    isExperiment = true;
+
+                    String content = "\n--------------------Experiment (Neutral) Start-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+
+                    happinessCount = 0;
+                    angerCount = 0;
+                    surpriseCount = 0;
+                    sadnessCount = 0;
+                    neutralCount = 0;
+
+                    mHSManager.clearQueue();
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Experiment (Neutral) End",Toast.LENGTH_SHORT).show();
+                    isExperiment = false;
+                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                    content = "\n--------------------Experiment (Neutral) End-------------------------\n";
+                    writeFile(finalFile, content.getBytes());
+                    writeFile(rawFile, content.getBytes());
+                }
             }
             hideSettings();
         }
