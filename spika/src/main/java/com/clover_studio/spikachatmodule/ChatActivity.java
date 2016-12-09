@@ -122,7 +122,7 @@ public class ChatActivity extends BaseActivity {
     private VibrationManager mVibrationManager;
 
     ////////////////////////// MCkang ///////////////////////////////
-    private boolean isExpereiment = false;
+    private boolean isExperiment = false;
 
     public static final String TAG = "TestFileActivity";
     public static final String STRSAVEPATH = Environment.
@@ -362,6 +362,12 @@ public class ChatActivity extends BaseActivity {
 
     private String preEmotionResult = "pre";
 
+    private int happinessCount = 0;
+    private int angerCount = 0;
+    private int supriseCount = 0 ;
+    private int sadnessCount = 0;
+    private int neutralCount = 0;
+
 
     // sbh : prev Facial emotion
 
@@ -449,17 +455,17 @@ public class ChatActivity extends BaseActivity {
                             if(preEmotionResult.equals("angry")){
                                 btnEmotion.setImageResource(R.drawable.ic_shy);
                                 classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                finalResult = "netural";
+                                finalResult = "neutral";
                             }else{
                                 btnEmotion.setImageResource(R.drawable.ic_happy);
                                 classifiedemotion = Const.Emotion.EMOTION_HAPPINESS;
-                                finalResult = "happniess";
+                                finalResult = "happiness";
                             }
                         } else if (RelativeEmotion.equals("surprise") || AbsoluteEmotion.equals("surprise")) {
                             if(preEmotionResult.equals("angry")){
                                 btnEmotion.setImageResource(R.drawable.ic_shy);
                                 classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                finalResult = "netural";
+                                finalResult = "neutral";
                             }else{
                                 btnEmotion.setImageResource(R.drawable.ic_surprise);
                                 classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
@@ -473,7 +479,7 @@ public class ChatActivity extends BaseActivity {
                             if(preEmotionResult.equals("angry")){
                                 btnEmotion.setImageResource(R.drawable.ic_shy);
                                 classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                finalResult = "netural";
+                                finalResult = "neutral";
                             }else{
                                 btnEmotion.setImageResource(R.drawable.ic_sad);
                                 classifiedemotion = Const.Emotion.EMOTION_SADNESS;
@@ -508,7 +514,7 @@ public class ChatActivity extends BaseActivity {
                                     if (preEmotionResult.equals("happniess") || preEmotionResult.equals("suprise")) {
                                         btnEmotion.setImageResource(R.drawable.ic_shy);
                                         classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                        finalResult = "netural";
+                                        finalResult = "neutral";
                                     } else if (tempHR.getLast() > tempMaxOfAverageHR.getFirst()) {
                                         btnEmotion.setImageResource(R.drawable.ic_angry);
                                         classifiedemotion = Const.Emotion.EMOTION_ANGRY;
@@ -516,17 +522,17 @@ public class ChatActivity extends BaseActivity {
                                     } else {
                                         btnEmotion.setImageResource(R.drawable.ic_shy);
                                         classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                        finalResult = "netural";
+                                        finalResult = "neutral";
                                     }
                                 } else {
                                     btnEmotion.setImageResource(R.drawable.ic_shy);
                                     classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                    finalResult = "netural";
+                                    finalResult = "neutral";
                                 }
                             }else{
                                 btnEmotion.setImageResource(R.drawable.ic_shy);
                                 classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                finalResult = "netural";
+                                finalResult = "neutral";
                             }
 
 
@@ -562,7 +568,7 @@ public class ChatActivity extends BaseActivity {
                         } else {
                             btnEmotion.setImageResource(R.drawable.ic_shy);
                             classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                            finalResult = "netural";
+                            finalResult = "neutral";
                         }
 
                         //JesungKim 20161130
@@ -574,7 +580,7 @@ public class ChatActivity extends BaseActivity {
                         mRecentEmotion.mFinalEstimatedEmotion = classifiedemotion;
                         mRecentEmotion.mWeight = RelativeResult.first;
 
-                        preEmotionResult = finalResult;
+
 
                         if(mHSManager!= null){
 
@@ -638,6 +644,21 @@ public class ChatActivity extends BaseActivity {
                             writeFile(file, content.getBytes() );
 
 
+                        }
+
+                        preEmotionResult = finalResult;
+
+                        //Count!
+                        if(finalResult.equals("happiness")){
+                            happinessCount++;
+                        }else if(finalResult.equals("angry")){
+                            angerCount++;
+                        }else if(finalResult.equals("suprise")){
+                            supriseCount++;
+                        }else if(finalResult.equals("sadness")){
+                            sadnessCount++;
+                        }else if(finalResult.equals("neutral")){
+                            neutralCount++;
                         }
                     }
                 });
@@ -943,6 +964,13 @@ public class ChatActivity extends BaseActivity {
     private AdapterView.OnItemClickListener onSettingItemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+//            data.add("Happiness");
+//            data.add("Anger");
+//            data.add("Surprise");
+//            data.add("Sadness");
+
+
             if (position == 0) {
                 forceStaySocket = true;
                 UsersInChatActivity.starUsersInChatActivity(getActivity(), activeUser.roomID);
@@ -951,15 +979,101 @@ public class ChatActivity extends BaseActivity {
             else if(position == 1)
             {
 
-                if(isExpereiment == false){
-                    Toast.makeText(getApplicationContext(),"Expereiment Start",Toast.LENGTH_SHORT).show();
-                    isExpereiment = true;
-                    String content = "\n--------------------Experiment Start-------------------------\n";
+                if(isExperiment == false){
+                    Toast.makeText(getApplicationContext(),"Experiment (Happiness) Start",Toast.LENGTH_SHORT).show();
+                    isExperiment = true;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
                     writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Happniess) Start-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+
+                    happinessCount = 0;
+                    angerCount = 0;
+                    supriseCount = 0;
+                    sadnessCount = 0;
+                    neutralCount = 0;
+
                 }else{
-                    Toast.makeText(getApplicationContext(),"Expereiment End",Toast.LENGTH_SHORT).show();
-                    isExpereiment = false;
-                    String content = "\n--------------------Experiment End-------------------------\n";
+                    Toast.makeText(getApplicationContext(),"Experiment (Happiness) End",Toast.LENGTH_SHORT).show();
+                    isExperiment = false;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Happiness) End-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+                }
+            }else if(position == 2){
+
+                if(isExperiment == false){
+                    Toast.makeText(getApplicationContext(),"Experiment (Anger) Start",Toast.LENGTH_SHORT).show();
+                    isExperiment = true;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Anger) Start-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+
+                    happinessCount = 0;
+                    angerCount = 0;
+                    supriseCount = 0;
+                    sadnessCount = 0;
+                    neutralCount = 0;
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Experiment (Anger) End",Toast.LENGTH_SHORT).show();
+                    isExperiment = false;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Anger) End-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+                }
+
+
+            }else if(position == 3){
+
+                if(isExperiment == false){
+                    Toast.makeText(getApplicationContext(),"Experiment (Suprise) Start",Toast.LENGTH_SHORT).show();
+                    isExperiment = true;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Suprise) Start-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+
+                    happinessCount = 0;
+                    angerCount = 0;
+                    supriseCount = 0;
+                    sadnessCount = 0;
+                    neutralCount = 0;
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Experiment (Suprise) End",Toast.LENGTH_SHORT).show();
+                    isExperiment = false;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Suprise) End-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+                }
+
+            }else if(position ==4){
+
+                if(isExperiment == false){
+                    Toast.makeText(getApplicationContext(),"Experiment (Sadness) Start",Toast.LENGTH_SHORT).show();
+                    isExperiment = true;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Sadness) Start-------------------------\n\n";
+                    writeFile(file, content.getBytes());
+
+                    happinessCount = 0;
+                    angerCount = 0;
+                    supriseCount = 0;
+                    sadnessCount = 0;
+                    neutralCount = 0;
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"Experiment (Sadness) End",Toast.LENGTH_SHORT).show();
+                    isExperiment = false;
+                    String content = "\nFinal Result --- Happniess : " + happinessCount + " Anger : " + angerCount + " Suprise : "+ supriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
+                    writeFile(file, content.getBytes());
+                    content = "\n--------------------Experiment (Sadness) End-------------------------\n";
                     writeFile(file, content.getBytes());
                 }
 

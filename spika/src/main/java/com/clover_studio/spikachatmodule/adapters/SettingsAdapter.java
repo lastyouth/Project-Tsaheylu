@@ -65,7 +65,10 @@ public class SettingsAdapter extends BaseAdapter {
 	 */
 	public void setSettings() {
 		data.add(ctx.getString(R.string.users));
-		data.add("Experiment");
+		data.add("Happiness");
+		data.add("Anger");
+		data.add("Surprise");
+		data.add("Sadness");
 		notifyDataSetChanged();
 	}
 
