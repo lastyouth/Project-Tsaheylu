@@ -1211,7 +1211,7 @@ public class ChatActivity extends BaseActivity {
                 }
             }else if(position == 6) {
                 Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                mPCManager = new PerformanceCheckManager(mPCMListener);
+                mPCManager = new PerformanceCheckManager(mPCMListener,-1);
             }
             hideSettings();
         }
@@ -1416,7 +1416,7 @@ public class ChatActivity extends BaseActivity {
 
             boolean showRepeat = false;
 
-            if(item.expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION || item.expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT)
+            if(item.expresser != null && (item.expresser.expresserType == Const.ExpresserType.EXPRESSER_VIBRATION || item.expresser.expresserType == Const.ExpresserType.EXPRESSER_EFFECT))
             {
                 showRepeat = true;
             }
@@ -1827,10 +1827,27 @@ public class ChatActivity extends BaseActivity {
             sentMessages.remove(message.localID);
         } else {
             message.status = Const.MessageStatus.RECEIVED;
+
             this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
+                    if(message.message.contains("0x00start"))
+                    {
+                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
+                        mPCManager = new PerformanceCheckManager(mPCMListener,0);
+                    }else if(message.message.equals("0x01start"))
+                    {
+                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
+                        mPCManager = new PerformanceCheckManager(mPCMListener,1);
+                    }else if(message.message.equals("0x02start"))
+                    {
+                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
+                        mPCManager = new PerformanceCheckManager(mPCMListener,2);
+                    }else if(message.message.equals("0x03start"))
+                    {
+                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
+                        mPCManager = new PerformanceCheckManager(mPCMListener,3);
+                    }
                     boolean toScrollBottom = false;
                     LinearLayoutManager llManager = (LinearLayoutManager) rvMessages.getLayoutManager();
                     if(llManager.findLastVisibleItemPosition() == rvMessages.getAdapter().getItemCount() - 1){

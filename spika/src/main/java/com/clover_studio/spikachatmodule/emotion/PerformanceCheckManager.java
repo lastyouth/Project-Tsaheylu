@@ -18,6 +18,7 @@ public class PerformanceCheckManager {
     private Timer mTimer;
     private long mStartTime;
     private String mSelectedEmotion;
+    private int mPredesignatedEmotion;
     public final int WAIT_TIME = 3000;
     private PerformanceCheckManagerListener mCallback;
     private TimerTask mTimerTask = new TimerTask() {
@@ -27,33 +28,38 @@ public class PerformanceCheckManager {
         }
     };
 
-    public PerformanceCheckManager(PerformanceCheckManagerListener m)
+    public PerformanceCheckManager(PerformanceCheckManagerListener m, int designatedEmotion)
     {
         mCallback = m;
+        mPredesignatedEmotion = designatedEmotion;
         mTimer = new Timer();
         mTimer.schedule(mTimerTask,WAIT_TIME);
     }
     private void checkStartInternal()
     {
         Random random = new Random();
-
         int n = random.nextInt();
         int emotion;
-        if(n < 0)
-        {
-            n*=-1;
-        }
-        emotion = n%4;
 
+        if(mPredesignatedEmotion == -1) {
+            if (n < 0) {
+                n *= -1;
+            }
+            emotion = n % 4;
+        }
+        else
+        {
+            emotion = mPredesignatedEmotion;
+        }
         if(emotion == 0)
         {
-            mSelectedEmotion = "화남";
+            mSelectedEmotion = "기쁨";
         }else if(emotion == 1)
         {
             mSelectedEmotion = "슬픔";
         }else if(emotion == 2)
         {
-            mSelectedEmotion = "기쁨";
+            mSelectedEmotion = "화남";
         }else if(emotion == 3)
         {
             mSelectedEmotion = "놀람";
