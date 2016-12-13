@@ -45,7 +45,7 @@ public class FacialEmotionManager {
     private Retrofit mRetrofitForMSEApi;
     private MSEmotionAPISupporter mAPISupporter;
     private static final String BASE_URL_FOR_MSE = "https://api.projectoxford.ai/";
-    private static final String KEY = "bef456add71f47c4994e448a950b2771";
+    private static final String KEY = "53c7d1c7bf2f4cecbecb53bfabc417bd"; //mckang key 2016-12-13
     private static final String CONTENT_TYPE = "application/octet-stream";
 
     // TimerTask
