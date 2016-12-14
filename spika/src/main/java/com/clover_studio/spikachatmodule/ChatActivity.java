@@ -1786,6 +1786,16 @@ public class ChatActivity extends BaseActivity {
         adapter.addSentMessage(sendMessage);
         if(sendMessage.type == Const.MessageType.TYPE_EXPRESSER)
         {
+            //This process must be logged
+            //KMC mckang
+            String content = new String();
+            Calendar time = Calendar.getInstance();
+            long now = time.getTimeInMillis();
+            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
+            writeFile(rawFile,content.getBytes());
+            //KMC mckang
+
+
             Expresser expresser = sendMessage.expresser;
 
             if(!expresser.there_is_no_cow_level() && !expresser.isOnline)
