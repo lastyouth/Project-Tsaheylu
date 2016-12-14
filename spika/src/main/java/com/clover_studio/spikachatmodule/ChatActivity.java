@@ -1841,22 +1841,20 @@ public class ChatActivity extends BaseActivity {
             this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(message.message.contains("0x00start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,0);
-                    }else if(message.message.equals("0x01start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,1);
-                    }else if(message.message.equals("0x02start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,2);
-                    }else if(message.message.equals("0x03start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,3);
+                    if(message.message != null) {
+                        if (message.message.contains("0x00start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 0);
+                        } else if (message.message.equals("0x01start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 1);
+                        } else if (message.message.equals("0x02start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 2);
+                        } else if (message.message.equals("0x03start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 3);
+                        }
                     }
                     boolean toScrollBottom = false;
                     LinearLayoutManager llManager = (LinearLayoutManager) rvMessages.getLayoutManager();
