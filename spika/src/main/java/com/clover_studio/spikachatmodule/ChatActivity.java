@@ -609,10 +609,18 @@ public class ChatActivity extends BaseActivity {
 
                             if(isExperiment==true) {
 
+//                                content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
+//                                writeFile(finalFile, content.getBytes());
+//                                content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+//                                writeFile(finalFile, content.getBytes());
+
+
                                 content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
                                 writeFile(rawFile, content.getBytes());
+                                writeFile(finalFile, content.getBytes());
                                 content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
                                 writeFile(rawFile, content.getBytes());
+                                writeFile(finalFile, content.getBytes());
                                 content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
                                         " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
                                 writeFile(rawFile, content.getBytes());
@@ -657,7 +665,8 @@ public class ChatActivity extends BaseActivity {
                         preEmotionResult = finalResult;
 
                         //Count!
-                        if(mHSManager.availableFlag == true) {
+//                        if(mHSManager.availableFlag == true) {
+                        if(isExperiment==true) {
 
                             if (finalResult.equals("happiness")) {
                                 happinessCount++;
@@ -1793,6 +1802,8 @@ public class ChatActivity extends BaseActivity {
             long now = time.getTimeInMillis();
             content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
             writeFile(rawFile,content.getBytes());
+//            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
+            writeFile(finalFile,content.getBytes());
             //KMC mckang
 
 
