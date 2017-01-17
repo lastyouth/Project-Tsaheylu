@@ -609,10 +609,18 @@ public class ChatActivity extends BaseActivity {
 
                             if(isExperiment==true) {
 
+//                                content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
+//                                writeFile(finalFile, content.getBytes());
+//                                content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+//                                writeFile(finalFile, content.getBytes());
+
+
                                 content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
                                 writeFile(rawFile, content.getBytes());
+                                writeFile(finalFile, content.getBytes());
                                 content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
                                 writeFile(rawFile, content.getBytes());
+                                writeFile(finalFile, content.getBytes());
                                 content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
                                         " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
                                 writeFile(rawFile, content.getBytes());
@@ -657,7 +665,8 @@ public class ChatActivity extends BaseActivity {
                         preEmotionResult = finalResult;
 
                         //Count!
-                        if(mHSManager.availableFlag == true) {
+//                        if(mHSManager.availableFlag == true) {
+                        if(isExperiment==true) {
 
                             if (finalResult.equals("happiness")) {
                                 happinessCount++;
@@ -1786,6 +1795,18 @@ public class ChatActivity extends BaseActivity {
         adapter.addSentMessage(sendMessage);
         if(sendMessage.type == Const.MessageType.TYPE_EXPRESSER)
         {
+            //This process must be logged
+            //KMC mckang
+            String content = new String();
+            Calendar time = Calendar.getInstance();
+            long now = time.getTimeInMillis();
+            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
+            writeFile(rawFile,content.getBytes());
+//            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
+            writeFile(finalFile,content.getBytes());
+            //KMC mckang
+
+
             Expresser expresser = sendMessage.expresser;
 
             if(!expresser.there_is_no_cow_level() && !expresser.isOnline)
@@ -1831,22 +1852,20 @@ public class ChatActivity extends BaseActivity {
             this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(message.message.contains("0x00start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,0);
-                    }else if(message.message.equals("0x01start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,1);
-                    }else if(message.message.equals("0x02start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,2);
-                    }else if(message.message.equals("0x03start"))
-                    {
-                        Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
-                        mPCManager = new PerformanceCheckManager(mPCMListener,3);
+                    if(message.message != null) {
+                        if (message.message.contains("0x00start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 0);
+                        } else if (message.message.equals("0x01start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 1);
+                        } else if (message.message.equals("0x02start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 2);
+                        } else if (message.message.equals("0x03start")) {
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 3);
+                        }
                     }
                     boolean toScrollBottom = false;
                     LinearLayoutManager llManager = (LinearLayoutManager) rvMessages.getLayoutManager();
