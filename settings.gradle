@@ -1,1 +1,1 @@
-include ':app', ':spika'
+include ':app', ':spika', ':wear'

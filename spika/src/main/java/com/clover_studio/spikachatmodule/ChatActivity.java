@@ -47,6 +47,8 @@ import com.clover_studio.spikachatmodule.emotion.EffectManager;
 import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
+import com.clover_studio.spikachatmodule.emotion.HeartSensorFromWearManager;
+import com.clover_studio.spikachatmodule.emotion.HeartSensorFromWearReceiver;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
 import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManager;
 import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManagerListener;
@@ -923,8 +925,12 @@ public class ChatActivity extends BaseActivity {
         FacialEmotionManager.getInstance().initializeFacialManager(mFEMListener);
 
         // initialize HeartSensorManager
-        mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
-        mHSManager.checkBluetooth();
+        //mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
+        //mHSManager.checkBluetooth();
+
+        // initialize HeartSensorFromWearManager
+        HeartSensorFromWearManager msr = HeartSensorFromWearManager.getInstance(this);
+        msr.startMeasurement();
 
         // initialize EffectManager
         Point displaySize = new Point();
@@ -964,7 +970,7 @@ public class ChatActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if(firstTime){
+        /*if(firstTime){
             //progress is visible, and it is showed in login method
 //            doNotShowProgressNow = true;
 //            boolean isInit = true;
@@ -989,16 +995,17 @@ public class ChatActivity extends BaseActivity {
             pausedForSocket = false;
         }
         forceStaySocket = false;
-        FacialEmotionManager.getInstance().initializeTimer(FacialEmotionManager.DEFAULT_INTERVAL);
+        FacialEmotionManager.getInstance().initializeTimer(FacialEmotionManager.DEFAULT_INTERVAL);*/
     }
 
     @Override
     protected void onPause() {
-        if (!forceStaySocket) {
+        // don't pause the socket when app's state changes to 'BACKGROUND'
+        /*if (!forceStaySocket) {
             SocketManager.getInstance().closeAndDisconnectSocket();
             pausedForSocket = true;
         }
-        FacialEmotionManager.getInstance().releaseTimer();
+        FacialEmotionManager.getInstance().releaseTimer();*/
         super.onPause();
     }
 
@@ -1010,7 +1017,12 @@ public class ChatActivity extends BaseActivity {
         {
             FacialEmotionManager.getInstance().releaseFacialManager();
         }
-        mHSManager.disconnect();
+        //mHSManager.disconnect();
+        // stop service
+        HeartSensorFromWearManager msr = HeartSensorFromWearManager.getInstance(this);
+
+        msr.stopMeasurement();
+
         super.onDestroy();
     }
 
