@@ -2,7 +2,6 @@ package com.clover_studio.spikachatmodule;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.FloatArrayEvaluator;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,7 +46,6 @@ import com.clover_studio.spikachatmodule.emotion.ExpresserCandidateManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManager;
 import com.clover_studio.spikachatmodule.emotion.FacialEmotionManagerListener;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorFromWearManager;
-import com.clover_studio.spikachatmodule.emotion.HeartSensorFromWearReceiver;
 import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
 import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManager;
 import com.clover_studio.spikachatmodule.emotion.PerformanceCheckManagerListener;
@@ -75,6 +72,7 @@ import com.clover_studio.spikachatmodule.utils.CustomImageDownloader;
 import com.clover_studio.spikachatmodule.utils.EmitJsonCreator;
 import com.clover_studio.spikachatmodule.utils.ErrorHandle;
 import com.clover_studio.spikachatmodule.utils.LogCS;
+import com.clover_studio.spikachatmodule.utils.LogManager;
 import com.clover_studio.spikachatmodule.utils.ParseUrlLinkMetadata;
 import com.clover_studio.spikachatmodule.utils.SeenByUtils;
 import com.clover_studio.spikachatmodule.utils.Tools;
@@ -90,17 +88,11 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -125,185 +117,13 @@ public class ChatActivity extends BaseActivity {
     private TextView newMessagesButton;
     private VibrationManager mVibrationManager;
 
-    ////////////////////////// MCkang ///////////////////////////////
+    // mckang
+
+
+    ////////////////////////// mckang ///////////////////////////////
     private boolean isExperiment = false;
-
-    public static String TAG = "Log_File";
-    public static String STRSAVEPATH = Environment.getExternalStorageDirectory()+"/LogFolder/";
-
-    public static String SAVEFILEPATH = "FinalResult.txt";
-    public static String SAVEFILEPATH2 = "RawResult.txt";
-    File dir;
-    File finalFile;
-    File rawFile;
-
-    /**
-     * 디렉토리 생성
-     * @return dir
-     */
-    private File makeDirectory(String dir_path){
-        File dir = new File(dir_path);
-        if (!dir.exists())
-        {
-            dir.mkdirs();
-            Log.i( TAG , "!dir.exists" );
-        }else{
-            Log.i( TAG , "dir.exists" );
-        }
-
-        return dir;
-    }
-
-    /**
-     * 파일 생성
-     * @param dir
-     * @return file
-     */
-    private File makeFile(File dir , String file_path){
-        File file = null;
-        boolean isSuccess = false;
-        if(dir.isDirectory()){
-            file = new File(file_path);
-            if(file!=null&&!file.exists()){
-                Log.i( TAG , "!file.exists" );
-                try {
-                    isSuccess = file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally{
-                    Log.i(TAG, "파일생성 여부 = " + isSuccess);
-                }
-            }else{
-                Log.i( TAG , "file.exists" );
-            }
-        }
-        return file;
-    }
-
-    /**
-     * (dir/file) 절대 경로 얻어오기
-     * @param file
-     * @return String
-     */
-    private String getAbsolutePath(File file){
-        return ""+file.getAbsolutePath();
-    }
-
-    /**
-     * (dir/file) 삭제 하기
-     * @param file
-     */
-    private boolean deleteFile(File file){
-        boolean result;
-        if(file!=null&&file.exists()){
-            file.delete();
-            result = true;
-        }else{
-            result = false;
-        }
-        return result;
-    }
-
-    /**
-     * 파일여부 체크 하기
-     * @param file
-     * @return
-     */
-    private boolean isFile(File file){
-        boolean result;
-        if(file!=null&&file.exists()&&file.isFile()){
-            result=true;
-        }else{
-            result=false;
-        }
-        return result;
-    }
-
-    /**
-     * 디렉토리 여부 체크 하기
-     * @param dir
-     * @return
-     */
-    private boolean isDirectory(File dir){
-        boolean result;
-        if(dir!=null&&dir.isDirectory()){
-            result=true;
-        }else{
-            result=false;
-        }
-        return result;
-    }
-
-    /**
-     * 파일 존재 여부 확인 하기
-     * @param file
-     * @return
-     */
-    private boolean isFileExist(File file){
-        boolean result;
-        if(file!=null&&file.exists()){
-            result=true;
-        }else{
-            result=false;
-        }
-        return result;
-    }
-
-    /**
-     * 파일 이름 바꾸기
-     * @param file
-     */
-    private boolean reNameFile(File file , File new_name){
-        boolean result;
-        if(file!=null&&file.exists()&&file.renameTo(new_name)){
-            result=true;
-        }else{
-            result=false;
-        }
-        return result;
-    }
-
-    /**
-     * 디렉토리에 안에 내용을 보여 준다.
-//     * @param file
-     * @return
-     */
-    private String[] getList(File dir){
-        if(dir!=null&&dir.exists())
-            return dir.list();
-        return null;
-    }
-
-    /**
-     * 파일에 내용 쓰기
-     * @param file
-     * @param file_content
-     * @return
-     */
-    private boolean writeFile(File file , byte[] file_content){
-        boolean result;
-        FileOutputStream fos;
-        if(file!=null&&file.exists()&&file_content!=null){
-            try {
-                fos = new FileOutputStream(file, true);
-                try {
-                    fos.write(file_content);
-                    fos.flush();
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            result = true;
-        }else{
-            result = false;
-        }
-        return result;
-    }
-
-
+    private HeartSensorFromWearManager msr;
+    private LogManager mLogManager;
     ////////////////////////////////////////////////////////////////////////////////
 
     // for candidate
@@ -444,7 +264,8 @@ public class ChatActivity extends BaseActivity {
                         }
 
                         mPrevFacialEmotion = m;
-                        int classifiedemotion;
+                        //initialize problem mckang?
+                        int classifiedemotion = Const.Emotion.CURRENT_EMOTION;
                         //JesungKim 20161130
                         String RelativeEmotion = RelativeResult.second;
                         String AbsoluteEmotion = AbsoluteResult.second;
@@ -495,79 +316,7 @@ public class ChatActivity extends BaseActivity {
                             //Compare with Max variation
                             //Compare with Min variation
 
-                            //Decision Tree
-                            //Increase over average
-                            //Decrease over average
-                            //Same with average
-                            if(mHSManager != null) {
-                                mHSManager.calculateAverage();
-                                mHSManager.calculateAverageOfAverageAndMinMax();
-                                mHSManager.calucateOverallAverage();
 
-                                LinkedList<Float> tempAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getAverageHR());
-                                LinkedList<Integer> tempMinHR = new LinkedList<Integer>(mHSManager.getHeartDate().getMinHR());
-                                LinkedList<Integer> tempMaxHR = new LinkedList<Integer>(mHSManager.getHeartDate().getMaxHR());
-
-                                LinkedList<Float> tempAverageOfAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getAverageOfAverageHR());
-
-                                LinkedList<Float> tempMaxOfAverageHR = new LinkedList<Float>(mHSManager.getHeartDate().getMaxOfAverageHR());
-                                LinkedList<Integer> tempHR = new LinkedList<Integer>(mHSManager.getHeartDate().getHR());
-
-                                //Max HR of average is bigger than current Input HR then Angry
-                                if (tempMaxOfAverageHR.size() != 0) {
-                                    if (preEmotionResult.equals("happiness") || preEmotionResult.equals("surprise")) {
-                                        btnEmotion.setImageResource(R.drawable.ic_shy);
-                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                        finalResult = "neutral";
-                                    } else if (tempHR.getLast() > tempMaxOfAverageHR.getFirst()) {
-                                        btnEmotion.setImageResource(R.drawable.ic_angry);
-                                        classifiedemotion = Const.Emotion.EMOTION_ANGRY;
-                                        finalResult = "angry";
-                                    } else {
-                                        btnEmotion.setImageResource(R.drawable.ic_shy);
-                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                        finalResult = "neutral";
-                                    }
-                                } else {
-                                    btnEmotion.setImageResource(R.drawable.ic_shy);
-                                    classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                    finalResult = "neutral";
-                                }
-                            }else{
-                                btnEmotion.setImageResource(R.drawable.ic_shy);
-                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                                finalResult = "neutral";
-                            }
-
-
-                            //first is old data, and last is new data
-//                            if(tempAverageHR.getFirst() < tempAverageHR.getLast()){
-//                                //compare min and max
-//                                if(tempMaxHR.getFirst() < tempMinHR.getLast()){
-//                                    //This means that new data is increased in comparsion with old data in terms of min, max, and average
-//                                    //This case the HR is increased in comparsion with 10 seconds before HR.
-//                                    //Thus, It could be anger
-//                                    //However, it could be netural when the increased HR is smaller than average (from new)
-//                                    if(tempAverageHR.getLast() > tempAverageOfAverageHR.getLast()){
-//                                        //then this emotion may be anger with high probability
-//                                        btnEmotion.setImageResource(R.drawable.ic_angry);
-//                                        classifiedemotion = Const.Emotion.EMOTION_ANGRY;
-//                                        finalResult = "angry";
-//                                    }else{
-//                                        btnEmotion.setImageResource(R.drawable.ic_shy);
-//                                        classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-//                                        finalResult = "netural";
-//                                    }
-//                                }else{
-//                                    btnEmotion.setImageResource(R.drawable.ic_shy);
-//                                    classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-//                                    finalResult = "netural";
-//                                }
-//                            }else{
-//                                btnEmotion.setImageResource(R.drawable.ic_shy);
-//                                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-//                                finalResult = "netural";
-//                            }
 
                         } else {
                             btnEmotion.setImageResource(R.drawable.ic_shy);
@@ -585,89 +334,20 @@ public class ChatActivity extends BaseActivity {
                         mRecentEmotion.mWeight = RelativeResult.first;
 
 
-
-                        if(mHSManager!= null){
-
-                            mHSManager.calculateAverage();
-                            mHSManager.calculateAverageOfAverageAndMinMax();
-                            mHSManager.calucateOverallAverage();
-
-                            //Compare with new data and Average of Average
-
-                            //For Log
-                            Log.i(Const.TAG,"Queue data(HR) : "+mHSManager.getHeartDate().getHR()  + " Average(HR) : " + mHSManager.getHeartDate().getAverageHR() + " Min (HR) : " +mHSManager.getHeartDate().getMinHR()
-                                    + " Max (HR) : " + mHSManager.getHeartDate().getMaxHR());
-                            Log.i(Const.TAG,"Queue data(HRV) : "+mHSManager.getHeartDate().getHRV() + " Average(HRV) : " + mHSManager.getHeartDate().getAverageHRV() + " Min (HR) : " + mHSManager.getHeartDate().getMinHRV()
-                                    + " Max (HRV) : "+ mHSManager.getHeartDate().getMaxHRV());
-
-                            Log.i(Const.TAG,"Average of average(HR) : " + mHSManager.getHeartDate().getAverageOfAverageHR()  + " Min of average(HR) : " + mHSManager.getHeartDate().getMinOfAverageHR()
-                                    + " Max of average(HR) : " + mHSManager.getHeartDate().getMaxOfAverageHR());
-                            Log.i(Const.TAG,"Average Of average(HRV) : " + mHSManager.getHeartDate().getAverageOfAverageHRV()  + " Min of average (HRV) : " + mHSManager.getHeartDate().getMinOfAverageHRV() +
-                                    " max of average (HRV) : " + mHSManager.getHeartDate().getMaxOfAverageHRV());
-
-                            String content = new String();
-                            Calendar time = Calendar.getInstance();
-                            long now = time.getTimeInMillis();
-
-                            if(isExperiment==true) {
-
-//                                content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
-//                                writeFile(finalFile, content.getBytes());
-//                                content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
-//                                writeFile(finalFile, content.getBytes());
+                        //mckang
+                        //For Log
 
 
-                                content = time.getTime().toString() + " available : "+ mHSManager.availableFlag + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                writeFile(finalFile, content.getBytes());
-                                content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                writeFile(finalFile, content.getBytes());
-                                content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
-                                        " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Overall HR average : " + mHSManager.getOverallAverageHR() + " Overall HRV average : " + mHSManager.getOverallAverageHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Queue HR  : " + mHSManager.getHeartDate().getHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Average HR : " + mHSManager.getHeartDate().getAverageHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Min HR : " + mHSManager.getHeartDate().getMinHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Max HR : " + mHSManager.getHeartDate().getMaxHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Average of average HR : " + mHSManager.getHeartDate().getAverageOfAverageHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Min of average HR : " + mHSManager.getHeartDate().getMinOfAverageHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Max of average HR : " + mHSManager.getHeartDate().getMaxOfAverageHR() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                ////////////////
-                                content = "Queue HRV : " + mHSManager.getHeartDate().getHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Average HRV : " + mHSManager.getHeartDate().getAverageHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Min HRV : " + mHSManager.getHeartDate().getMinHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Max HRV : " + mHSManager.getHeartDate().getMaxHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Average of average HRV : " + mHSManager.getHeartDate().getAverageOfAverageHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Min of average HRV : " + mHSManager.getHeartDate().getMinOfAverageHRV() + "\n";
-                                writeFile(rawFile, content.getBytes());
-                                content = "Max of average HRV : " + mHSManager.getHeartDate().getMaxOfAverageHRV() + "\n\n";
-                                writeFile(rawFile, content.getBytes());
+                        if(isExperiment==true) {
 
-                            }
-
-
-
+                            //For Log data log
+                            mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, msr);
                         }
 
                         preEmotionResult = finalResult;
 
                         //Count!
-//                        if(mHSManager.availableFlag == true) {
+//                      if(mHSManager.availableFlag == true) {
                         if(isExperiment==true) {
 
                             if (finalResult.equals("happiness")) {
@@ -682,6 +362,12 @@ public class ChatActivity extends BaseActivity {
                                 neutralCount++;
                             }
                         }
+
+                        //NewCodeMCkang
+                        //mckang test average and state
+                        String currentState = msr.getCurrentState();
+                        Log.i(Const.TAG,"Current State : " + currentState);
+
                     }
                 });
             }
@@ -921,15 +607,15 @@ public class ChatActivity extends BaseActivity {
         intentFilter.addAction(ApplicationStateManager.APPLICATION_RESUMED);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiverImplementation, intentFilter);
 
-        // initialize FacialManaer
+        // initialize FacialManager
         FacialEmotionManager.getInstance().initializeFacialManager(mFEMListener);
 
         // initialize HeartSensorManager
-        //mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
+//        mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
         //mHSManager.checkBluetooth();
 
         // initialize HeartSensorFromWearManager
-        HeartSensorFromWearManager msr = HeartSensorFromWearManager.getInstance(this);
+        msr = HeartSensorFromWearManager.getInstance(this);
         msr.startMeasurement();
 
         // initialize EffectManager
@@ -944,23 +630,10 @@ public class ChatActivity extends BaseActivity {
         System.out.println("User ID Test : " + activeUser.getUserID());
         System.out.println("Room ID Test : "+ activeUser.getRoomID());
 
-        ///////////////////// MCkang /////////////////////////////////
-        //폴더 생성
-        dir = makeDirectory(STRSAVEPATH);
-        //파일 생성
+        ///////////////////// mckang /////////////////////////////////
 
-//        activeUser.toString();
-//        System.out.println("User ID Test : " + activeUser.getUserID());
-//        System.out.println("Room ID Test : "+ activeUser.getRoomID());
+        mLogManager = new LogManager(activeUser.getRoomID());
 
-        finalFile = makeFile(dir, (STRSAVEPATH+activeUser.roomID+"_"+SAVEFILEPATH));
-        rawFile = makeFile(dir, (STRSAVEPATH+activeUser.roomID+"_"+SAVEFILEPATH2));
-        //절대 경로
-
-        Log.i(TAG, ""+getAbsolutePath(dir));
-        Log.i(TAG, ""+getAbsolutePath(finalFile));
-        Log.i(TAG, ""+getAbsolutePath(dir));
-        Log.i(TAG, ""+getAbsolutePath(rawFile));
         ////////////////////////////////////////////////////////////////
 
 
@@ -1064,8 +737,6 @@ public class ChatActivity extends BaseActivity {
 //            data.add("Sadness");
 //            data.add("Neutral");
 
-
-
             if (position == 0) {
                 forceStaySocket = true;
                 UsersInChatActivity.starUsersInChatActivity(getActivity(), activeUser.roomID);
@@ -1077,13 +748,8 @@ public class ChatActivity extends BaseActivity {
                 if(isExperiment == false){
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
-                    String content = "\n--------------------Experiment (Happiness) Start-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
 
+                    mLogManager.writeExperimentLog("Happniness","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1091,17 +757,14 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-                    mHSManager.clearQueue();
+//                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\n--------------------Experiment (Happiness) End-------------------------\n\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+
+                    mLogManager.writeExperimentLog("Happniness","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
                 }
             }else if(position == 2){
 
@@ -1109,12 +772,8 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(),"Experiment (Anger) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
 
-                    String content = "\n--------------------Experiment (Anger) Start-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+                    mLogManager.writeExperimentLog("Anger","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1122,17 +781,15 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-                    mHSManager.clearQueue();
+//                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Anger) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\n--------------------Experiment (Anger) End-------------------------\n\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+
+                    mLogManager.writeExperimentLog("Anger","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
+
                 }
 
 
@@ -1142,12 +799,7 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(),"Experiment (Surprise) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
 
-                    String  content = "\n--------------------Experiment (Surprise) Start-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+                    mLogManager.writeExperimentLog("Surprise","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1155,17 +807,14 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-                    mHSManager.clearQueue();
+//                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Surprise) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\n--------------------Experiment (Surprise) End-------------------------\n\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+
+                    mLogManager.writeExperimentLog("Surprise","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
                 }
 
             }else if(position ==4){
@@ -1174,12 +823,7 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(),"Experiment (Sadness) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
 
-                    String  content = "\n--------------------Experiment (Sadness) Start-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+                    mLogManager.writeExperimentLog("Sadness","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1187,17 +831,14 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-                    mHSManager.clearQueue();
+//                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Sadness) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\n--------------------Experiment (Sadness) End-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+
+                    mLogManager.writeExperimentLog("Sadness","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
                 }
 
             }else if(position == 5){
@@ -1205,12 +846,8 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(),"Experiment (Neutral) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
 
-                    String content = "\n--------------------Experiment (Neutral) Start-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\nBefore Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+                    mLogManager.writeExperimentLog("Neutral","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1218,17 +855,15 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-                    mHSManager.clearQueue();
+//                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Neutral) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
-                    String content = "\nFinal Result --- Happiness : " + happinessCount + " Anger : " + angerCount + " Surprise : "+ surpriseCount + " Sadness : " + sadnessCount + " Neutral : " + neutralCount + "\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
-                    content = "\n--------------------Experiment (Neutral) End-------------------------\n";
-                    writeFile(finalFile, content.getBytes());
-                    writeFile(rawFile, content.getBytes());
+
+                    mLogManager.writeExperimentLog("Neutral","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+
+
                 }
             }else if(position == 6) {
                 Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();
@@ -1809,13 +1444,7 @@ public class ChatActivity extends BaseActivity {
         {
             //This process must be logged
             //KMC mckang
-            String content = new String();
-            Calendar time = Calendar.getInstance();
-            long now = time.getTimeInMillis();
-            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
-            writeFile(rawFile,content.getBytes());
-//            content = "\nTouch Event occur --- "+time.getTime().toString() + " --- User touches the expressor function \n\n";
-            writeFile(finalFile,content.getBytes());
+            mLogManager.writeTouchEvent();
             //KMC mckang
 
 
