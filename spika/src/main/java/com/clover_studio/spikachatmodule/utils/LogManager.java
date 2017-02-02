@@ -229,24 +229,24 @@ public class LogManager {
 
     }
 
-    public void writeRawData(String finalResult, String preEmotionResult, String RelativeEmotion, String AbsoluteEmotion,FacialEmotionModel m, HeartSensorFromWearManager msr){
-        String content = new String();
-        Calendar time = Calendar.getInstance();
-        long now = time.getTimeInMillis();
-        content = content = time.getTime().toString() + " available : "+ msr.getAvailableFlag()+ "\n";
-        writeLog(content);
-        content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
-        writeLog(content);
-        content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
-                " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
-        writeLog(content);
-        content = "Queue HR : " + msr.getHRList() +"\n";
-        writeLog(content);
-        content = "Average HR : " + msr.getAverageHRList() +"\n";
-        writeLog(content);
-        content = "Max of average HR : " + msr.getMaxOfAverageHRList() + "\n";
-        writeLog(content);
-        content = "Min of average HR : " + msr.getMinOfAverageHRList() + "\n";
+        public void writeRawData(String finalResult, String preEmotionResult, String RelativeEmotion, String AbsoluteEmotion,FacialEmotionModel m, HeartSensorFromWearManager msr){
+            String content = new String();
+            Calendar time = Calendar.getInstance();
+            long now = time.getTimeInMillis();
+            content = content = time.getTime().toString() + " available : "+ msr.getAvailableFlag()+ "\n";
+            writeLog(content);
+            content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+            writeLog(content);
+            content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
+                    " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
+            writeLog(content);
+            content = "Queue HR : " + msr.getHRList() +"\n";
+            writeLog(content);
+            content = "Average HR : " + msr.getAverageHRList() +"\n";
+            writeLog(content);
+            content = "Max of average HR : " + msr.getMaxOfAverageHRList() + "\n";
+            writeLog(content);
+            content = "Min of average HR : " + msr.getMinOfAverageHRList() + "\n";
         writeLog(content);
     }
 

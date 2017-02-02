@@ -344,24 +344,7 @@ public class ChatActivity extends BaseActivity {
                             mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, msr);
                         }
 
-                        preEmotionResult = finalResult;
 
-                        //Count!
-//                      if(mHSManager.availableFlag == true) {
-                        if(isExperiment==true) {
-
-                            if (finalResult.equals("happiness")) {
-                                happinessCount++;
-                            } else if (finalResult.equals("angry")) {
-                                angerCount++;
-                            } else if (finalResult.equals("surprise")) {
-                                surpriseCount++;
-                            } else if (finalResult.equals("sadness")) {
-                                sadnessCount++;
-                            } else if (finalResult.equals("neutral")) {
-                                neutralCount++;
-                            }
-                        }
 
                         //NewCodeMCkang
                         //mckang test average and state
