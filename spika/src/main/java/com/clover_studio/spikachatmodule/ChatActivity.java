@@ -181,8 +181,13 @@ public class ChatActivity extends BaseActivity {
 
     // jsk : additional variables
     static private long mEmotionDurationCounter = 0;
-    static private final long DEFAULT_EMOTION_DURATION_DELAY = 2; // Delay twice
+    //static private final long DEFAULT_EMOTION_DURATION_DELAY = 2; // Delay twice
+    static private final long DEFAULT_EMOTION_DURATION_DELAY = 0; // Delay twice
     private int mPreviousEmotion;
+
+    //Jesung Kim_20170214_START
+    private String mPrevRelativeEmotion = "neutral";
+    //Jesung Kim_20170214_END
 
     private String preEmotionResult = "pre";
 
@@ -271,11 +276,15 @@ public class ChatActivity extends BaseActivity {
                         String AbsoluteEmotion = AbsoluteResult.second;
                         String finalResult = "final";
 
-                        //JesungKim 20161130
-                        if(mEmotionDurationCounter > 0) {
-                            mEmotionDurationCounter--;
-                        }
 
+
+                        //JesungKim 20161130
+                        //if(mEmotionDurationCounter > 0) {
+                        //    mEmotionDurationCounter--;
+                        //}
+
+                        //JesungKim 20170203 - "Discarded Internal Function"
+                        /*
                         if (RelativeEmotion.equals("happiness") || AbsoluteEmotion.equals("happiness")) {
                             if(preEmotionResult.equals("angry")){
                                 btnEmotion.setImageResource(R.drawable.ic_shy);
@@ -321,13 +330,456 @@ public class ChatActivity extends BaseActivity {
                         } else {
                             btnEmotion.setImageResource(R.drawable.ic_shy);
                             classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
-                            finalResult = "neutral";
+                                                   finalResult = "neutral";
                         }
 
                         //JesungKim 20161130
                         if (mRecentEmotion.mFinalEstimatedEmotion != classifiedemotion) {
                             mEmotionDurationCounter = DEFAULT_EMOTION_DURATION_DELAY;
                         }
+                        */
+
+                        //JesungKim 20170223 - Revised Recognition Mechanism
+                        String currentState = msr.getCurrentState();    //Get HR Result First
+                        Log.i(Const.TAG,"Current State : " + currentState);
+
+                        if (currentState.equals("positive")) {
+                            Log.e(Const.TAG,"JesungKim -- HR: (" + currentState + ")");
+
+                            if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "neutral";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "neutral";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+
+                            else {
+                                Log.e(Const.TAG,"JesungKim -- Unexpected Facial Emotion Result [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                        }
+                        if (currentState.equals("negative") || currentState.equals("neutral") || currentState.equals("unavailable") || currentState.equals("positive")) {
+                        //else if (currentState.equals("neutral") || currentState.equals("unavailable")) {
+                            Log.e(Const.TAG,"JesungKim -- HR: (" + currentState + ")");
+
+                            if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "sadness";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "surprise";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "sadness";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "angry";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "sadness";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "neutral";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+
+                            else {
+                                Log.e(Const.TAG,"JesungKim -- Unexpected Facial Emotion Result [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                        }
+
+
+
+                        else if (currentState.equals("negative")) {
+                            Log.e(Const.TAG,"JesungKim -- HR: (" + currentState + ")");
+
+                            if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "happiness";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "angry";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "angry";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "surprise";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                                else if ( AbsoluteEmotion.equals("surprise") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+                            else if ( AbsoluteEmotion.equals("sadness") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "sadness";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "angry";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "angry";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("anger") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+
+                            /****************************************/
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("happiness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("surprise") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("sadness") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                //finalResult = "sadness";
+                                if ( RelativeEmotion.equals(mPrevRelativeEmotion) ){
+                                    finalResult = "sadness";
+                                }
+                                else {
+                                    finalResult = "angry";
+                                }
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("anger") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+                            else if ( AbsoluteEmotion.equals("neutral") && RelativeEmotion.equals("neutral") ) {
+                                Log.e(Const.TAG,"JesungKim -- [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "angry";
+                            }
+
+                            else {
+                                Log.e(Const.TAG,"JesungKim -- Unexpected Facial Emotion Result [" + AbsoluteEmotion + "|" + RelativeEmotion + "]");
+                                finalResult = "neutral";
+                            }
+                        }
+                        else {
+                            Log.e(Const.TAG,"JesungKim -- Case[0]: Unexpected HR Result (" + currentState + ")");
+                        }
+
+                        //Jesung Kim 20170203
+                        //Determine Final Emotion State
+                        if (finalResult.equals("happiness")) {
+                            Log.e(Const.TAG,"JesungKim -- finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_happy);
+                            classifiedemotion = Const.Emotion.EMOTION_HAPPINESS;
+                        }
+                        else if (finalResult.equals("surprise")) {
+                            Log.e(Const.TAG,"JesungKim -- finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_surprise);
+                            classifiedemotion = Const.Emotion.EMOTION_SURPRISE;
+                        }
+                        else if (finalResult.equals("sadness")) {
+                            Log.e(Const.TAG,"JesungKim -- finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_sad);
+                            classifiedemotion = Const.Emotion.EMOTION_SADNESS;
+                        }
+                        else if (finalResult.equals("angry")) {
+                            Log.e(Const.TAG,"JesungKim -- finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_angry);
+                            classifiedemotion = Const.Emotion.EMOTION_ANGRY;
+                        }
+                        else if (finalResult.equals("neutral")) {
+                            Log.e(Const.TAG,"JesungKim -- finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_shy);
+                            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                        }
+                        else {
+                            Log.e(Const.TAG,"JesungKim -- Unexpected finalResult: [" + finalResult + "]");
+                            btnEmotion.setImageResource(R.drawable.ic_shy);
+                            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+                        }
+
+                        //JesungKim_20170214_START
+                        mPrevRelativeEmotion = RelativeResult.second;
+                        //JesungKim_20170214_END
 
 
                         mRecentEmotion.mFinalEstimatedEmotion = classifiedemotion;
@@ -337,7 +789,6 @@ public class ChatActivity extends BaseActivity {
                         //mckang
                         //For Log
 
-
                         if(isExperiment==true) {
 
                             //For Log data log
@@ -345,12 +796,14 @@ public class ChatActivity extends BaseActivity {
                         }
 
 
+                        //JesungKim 20170223 - Move to Upper Region
 
+                        /*
                         //NewCodeMCkang
                         //mckang test average and state
                         String currentState = msr.getCurrentState();
                         Log.i(Const.TAG,"Current State : " + currentState);
-
+                        */
                     }
                 });
             }
