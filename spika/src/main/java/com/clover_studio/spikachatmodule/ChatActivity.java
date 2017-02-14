@@ -466,8 +466,8 @@ public class ChatActivity extends BaseActivity {
                                 finalResult = "neutral";
                             }
                         }
-                        if (currentState.equals("negative") || currentState.equals("neutral") || currentState.equals("unavailable") || currentState.equals("positive")) {
-                        //else if (currentState.equals("neutral") || currentState.equals("unavailable")) {
+
+                        else if (currentState.equals("neutral") || currentState.equals("unavailable")) {
                             Log.e(Const.TAG,"JesungKim -- HR: (" + currentState + ")");
 
                             if ( AbsoluteEmotion.equals("happiness") && RelativeEmotion.equals("happiness") ) {
