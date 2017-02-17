@@ -191,11 +191,17 @@ public class ChatActivity extends BaseActivity {
 
     private String preEmotionResult = "pre";
 
+    //mckang
     private int happinessCount = 0;
     private int angerCount = 0;
     private int surpriseCount = 0 ;
     private int sadnessCount = 0;
     private int neutralCount = 0;
+
+    //mckang
+    private int positiveHRCount = 0;
+    private int neutralHRCount = 0;
+    private int negativeHRCount = 0;
 
 
     // sbh : prev Facial emotion
@@ -793,6 +799,13 @@ public class ChatActivity extends BaseActivity {
 
                             //For Log data log
                             mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, msr);
+                            if(currentState.equals("positive")){
+                                positiveHRCount++;
+                            }else if(currentState.equals("negative")){
+                                negativeHRCount++;
+                            }else if(currentState.equals("neutral")){
+                                neutralHRCount++;
+                            }
                         }
 
 
@@ -1185,7 +1198,7 @@ public class ChatActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) Start",Toast.LENGTH_SHORT).show();
                     isExperiment = true;
 
-                    mLogManager.writeExperimentLog("Happniness","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+                    mLogManager.writeExperimentLog("Happiness","Start", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
                     happinessCount = 0;
                     angerCount = 0;
@@ -1193,13 +1206,19 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                    mHSManager.clearQueue();
+//                  mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) End",Toast.LENGTH_SHORT).show();
                     isExperiment = false;
 
-                    mLogManager.writeExperimentLog("Happniness","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+                    mLogManager.writeExperimentLog("Happiness","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
+                    //mckang for log
+                    String content = "HR results --- Positive : "+ positiveHRCount + " Negative : "+ negativeHRCount+ " Neutral : " + neutralHRCount+"\n";
+                    mLogManager.writeLog(content);
+                    positiveHRCount = 0;
+                    negativeHRCount = 0;
+                    neutralHRCount = 0;
 
                 }
             }else if(position == 2){

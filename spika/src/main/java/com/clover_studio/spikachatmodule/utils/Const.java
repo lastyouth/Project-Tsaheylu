@@ -219,7 +219,7 @@ public class Const {
         static public final int EMOTION_ANGRY = 0x02;
         static public final int EMOTION_SURPRISE = 0x03;
         static public final int EMOTION_NEUTRAL = 0x04;
-        static public final int MAX_QUEUED_DATA_FOR_HRV = 10;
+        static public final int MAX_QUEUED_DATA_FOR_HRV = 5;
         static public final int MAX_EXPRESSER_CANDIDATE = 5;
         static public final int CURRENT_EMOTION = 0x1024;
     }

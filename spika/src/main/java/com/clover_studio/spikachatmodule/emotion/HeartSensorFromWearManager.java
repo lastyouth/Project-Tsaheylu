@@ -51,6 +51,46 @@ public class HeartSensorFromWearManager {
     private LinkedList<Float> averageHRList;
     private LinkedList<Float> maxOfAverageHRList;
     private LinkedList<Float> minOfAverageHRList;
+    //mckang
+    private int dataCount;
+    //mckang
+    public float allAverage;
+    public float allSum;
+    public int allCount;
+    public float allMax;
+    public float allMin;
+
+    private String preState;
+
+//    public float upperMax;
+//    public float upperAverage;
+//    public float upperMin;
+//    public float middleMax;
+//    public float middleAverage;
+//    public float middleMin;
+//    public float lowerMax;
+//    public float lowerAverage;
+//    public float lowerMin;
+
+    public LinkedList<Float> negativeValues;
+    public LinkedList<Float> neutralValues;
+    public LinkedList<Float> positiveValues;
+
+    public float maxNegative;
+    public float minNegative;
+    public float maxNeutral;
+    public float minNeutral;
+    public float maxPositive;
+    public float minPositive;
+
+    public float maxNeutralSum;
+    public float minNeutralSum;
+    private float maxNeutralCount;
+    private float minNeutralCount;
+
+    public float maxNeutralAverage;
+    public float minNeutralAverage;
+
 
 
     public void addSensorDataToQueue(float[] hr, long timestamp, int accuracy)
@@ -64,18 +104,35 @@ public class HeartSensorFromWearManager {
 
         if(mHRList != null)
         {
+            //For Logging
+            allCount++;
+            allSum += rawdata.heartrate;
+            allAverage = allSum / allCount;
+            if( allMax < rawdata.heartrate){
+                allMax = rawdata.heartrate;
+            }
+            if(allMin > rawdata.heartrate){
+                allMin = rawdata.heartrate;
+            }
+            ////////////////////
+
             if(mHRList.size() != queueSize){
                 mHRList.add(rawdata);
                 HRList.add(rawdata.heartrate);
                 Log.e(TAG,"New heartrate data is added");
             }else{
-                setCurrentAverage();
+                if(dataCount == queueSize) {
+                    setCurrentAverage();
+                    dataCount = 0;
+                }
                 HRList.removeFirst();
                 HRList.add(rawdata.heartrate);
                 mHRList.removeFirst();
                 mHRList.add(rawdata);
                 Log.e(TAG,"New heartrate data is added");
             }
+
+            dataCount++;
 
         }
         else
@@ -107,12 +164,49 @@ public class HeartSensorFromWearManager {
         //mckang
         mHRList = new LinkedList<HeartSensorDataFromWear>();
         queueSize = Const.Emotion.MAX_QUEUED_DATA_FOR_HRV;
+        dataCount = 0;
         HRList = new LinkedList<Float>();
         averageHRList = new LinkedList<Float>();
         maxOfAverageHRList = new LinkedList<Float>();
         minOfAverageHRList = new LinkedList<Float>();
         availableFlag = "NO";
 
+        allSum = 0;
+        allMax = 0;
+        allCount = 0;
+        allMin = 1000;
+
+        preState = new String("unavailable");
+
+//        upperMax = 0;
+//        upperMin = 1000;
+//        middleMax = 0;
+//        middleMin = 1000;
+//        lowerMax = 0;
+//        lowerMin = 1000;
+//
+//        upperAverage = 0;
+//        middleAverage = 0;
+//        lowerAverage = 0;
+        negativeValues = new LinkedList<>();
+        neutralValues = new LinkedList<>();
+        positiveValues = new LinkedList<>();
+
+        maxNegative = 0;
+        minNegative = 10000;
+        maxNeutral = 0;
+        minNeutral = 10000;
+        maxPositive = 0;
+        minPositive = 10000;
+
+
+        maxNeutralSum = 0;
+        minNeutralSum = 0;
+        maxNeutralCount = 0;
+        minNeutralCount = 0;
+
+        maxNeutralAverage = 0;
+        minNeutralAverage = 0;
 
     }
     public void startMeasurement() {
@@ -164,20 +258,22 @@ public class HeartSensorFromWearManager {
         }
     }
 
+
     //mckang
+    //new max and min
     public void setMaxAndMinOfAverageHRList(){
         float maxHR = 0;
         float minHR = 100000;
-        if(averageHRList.size() != 0 && averageHRList.size() == 10){
+        if(mHRList.size() != 0 && mHRList.size() == queueSize){
 
-            for(int i = 0; i < averageHRList.size(); i++){
+            for(int i = 0; i < mHRList.size()  ; i++){
                 //Find Max
-                if(maxHR < averageHRList.get(i)){
-                    maxHR = averageHRList.get(i);
+                if(maxHR < mHRList.get(i).heartrate){
+                    maxHR = mHRList.get(i).heartrate;
                 }
                 //Find Min
-                if(minHR > averageHRList.get(i)){
-                    minHR = averageHRList.get(i);
+                if(minHR > mHRList.get(i).heartrate){
+                    minHR = mHRList.get(i).heartrate;
                 }
             }
             //Add Max data
@@ -216,18 +312,72 @@ public class HeartSensorFromWearManager {
         }
     }
 
+//    //mckang
+//    public void setMaxAndMinOfAverageHRList(){
+//        float maxHR = 0;
+//        float minHR = 100000;
+//        if(averageHRList.size() != 0 && averageHRList.size() == 10){
+//
+//            for(int i = 0; i < averageHRList.size(); i++){
+//                //Find Max
+//                if(maxHR < averageHRList.get(i)){
+//                    maxHR = averageHRList.get(i);
+//                }
+//                //Find Min
+//                if(minHR > averageHRList.get(i)){
+//                    minHR = averageHRList.get(i);
+//                }
+//            }
+//            //Add Max data
+//                if(maxOfAverageHRList != null){
+//                if(maxHR != 0) {
+//                    if (maxOfAverageHRList.size() != queueSize) {
+//                        maxOfAverageHRList.add(maxHR);
+//                    } else {
+//                        maxOfAverageHRList.removeFirst();
+//                        maxOfAverageHRList.add(maxHR);
+//                    }
+//                    Log.i(Const.TAG, "New maxOfAverageHR data is added");
+//                }else{
+//                    Log.i(Const.TAG, "Unavailable Max HR data");
+//                }
+//            }else{
+//                Log.i(Const.TAG, "maxOfAverageHRList is null");
+//            }
+//            //Add Min Data
+//            if(minOfAverageHRList != null){
+//                if(minHR != 100000) {
+//                    if (minOfAverageHRList.size() != queueSize) {
+//                        minOfAverageHRList.add(minHR);
+//                    } else {
+//                        minOfAverageHRList.removeFirst();
+//                        minOfAverageHRList.add(minHR);
+//                    }
+//                    Log.i(Const.TAG, "New minOfAverageHR data is added");
+//                }else{
+//                    Log.i(Const.TAG, "Unavailable Min HR data");
+//                }
+//            }else{
+//                Log.i(Const.TAG, "minOfAverageHRList is null");
+//            }
+//
+//        }
+//    }
+
     public void setCurrentAverage(){
         float averageHR = 0;
         float sumOfHR = 0;
-        if(mHRList.size() != 0 && mHRList.size() == 10){
+        if(mHRList.size() != 0 && mHRList.size() == queueSize){
 
-            for (int i = 0; i < mHRList.size(); i++) {
+            for (int i = 0; i < mHRList.size() ; i++) {
                 sumOfHR += mHRList.get(i).heartrate;
             }
-            averageHR = sumOfHR / mHRList.size();
+            averageHR = sumOfHR / (mHRList.size());
 
             if(averageHRList != null){
                 if(averageHRList.size() != queueSize){
+                    //set Max Average HR
+                    setMaxAndMinOfAverageHRList();
                     averageHRList.add(averageHR);
                 }else{
                     //set Max Average HR
@@ -242,35 +392,514 @@ public class HeartSensorFromWearManager {
 
         }
     }
+    //mckang for detecting lower, middle, and upper state
+    private String getChangeState( LinkedList<Float> data){
+        String state = new String("middle");
+
+        LinkedList<Float> tempData = new LinkedList<>(data);
+
+        if(tempData.getFirst() < tempData.getLast()){
+            if((tempData.getLast() - tempData.getFirst()) > 1 ){
+                for(int i = 1; i < tempData.size()-1; i++){
+                    if(tempData.get(i) > tempData.getLast()){
+                        state = "middle";
+                        break;
+                    }else{
+                        state = "upper";
+                        break;
+                    }
+                }
+            }else{
+                state = "middle";
+            }
+        }
+        else if(tempData.getFirst() > tempData.getLast()){
+            if((tempData.getFirst() - tempData.getLast()) > 1){
+                for(int i = 1 ; i< tempData.size()-1; i++) {
+                    if (tempData.get(i) < tempData.getLast()) {
+                        state = "middle";
+                        break;
+                    } else {
+                        state = "lower";
+                        break;
+                    }
+                }
+            }else{
+                state = "middle";
+            }
+        }
+        else if(tempData.getFirst() == tempData.getLast()){
+            state = "middle";
+        }
+
+        return state;
+    }
+
     // mckang
     // State is four (unavailable, positive, neutral, and negative),
     public String getCurrentState(){
         String state = new String("unavailable");
 
-        float maxHR = 0;
-        float minHR = 0;
+        float maxHR_F = 0;
+        float minHR_F = 0;
+        float maxHR_L = 0;
+        float minHR_L = 0;
         float lastHR = 0;
 
-//        Log.i("Average ")
+        float averageHR_F = 0;
+        float averageHR_L = 0;
 
-        if(maxOfAverageHRList.size() != 0 && minOfAverageHRList.size() != 0){
+        String changeState = new String();
 
-            maxHR = maxOfAverageHRList.getFirst();
-            minHR = minOfAverageHRList.getFirst();
+        String initialState = new String();
+
+//      if(maxOfAverageHRList.size() != 0 && minOfAverageHRList.size() != 0){
+        if(maxOfAverageHRList.size() != 0 && minOfAverageHRList.size() != 0
+                && maxOfAverageHRList.size() == queueSize && minOfAverageHRList.size() == queueSize){
+
+            maxHR_F = maxOfAverageHRList.getFirst();
+            minHR_F = minOfAverageHRList.getFirst();
+            maxHR_L = maxOfAverageHRList.getLast();
+            minHR_L = maxOfAverageHRList.getLast();
             lastHR = mHRList.getLast().heartrate;
+            averageHR_F = averageHRList.getFirst();
+            averageHR_L = averageHRList.getLast();
 
-            Log.i(Const.TAG, "Average (last) " + averageHRList.getLast() + " Max HR : "+ maxHR + " Min HR : "+ minHR + " Last HR : "+lastHR);
-            if(maxHR < lastHR){
-                state = "negative";
-            }else if (minHR > lastHR){
-                state = "positive";
+            Log.i(Const.TAG, "Average (last) " + averageHRList.getLast() + " Max HR F : "+ maxHR_F + " Min HR F : "+ minHR_F
+                    + " Max HR L : " + maxHR_L + " Min HR L : " + minHR_L + " Last HR : "+lastHR);
+
+
+            if(negativeValues.size() != queueSize || neutralValues.size() != queueSize || positiveValues.size() != queueSize){
+
+                if(maxHR_F < lastHR){
+                    initialState = "negative";
+                }else if (minHR_F > lastHR){
+                    initialState = "positive";
+                }else{
+                    initialState = "neutral";
+                }
+
+                if(initialState.equals("negative")){
+                    if (negativeValues.size() != queueSize) {
+                        negativeValues.add(lastHR);
+                    } else {
+                        negativeValues.removeFirst();
+                        negativeValues.add(lastHR);
+                    }
+
+                    //Consider neutral !
+                    if(neutralValues.size()!= 0
+                            && maxNeutral!=0){
+                        if(lastHR < maxNeutral){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+
+                }else if(initialState.equals("neutral")){
+
+                    if(negativeValues.size()!=0
+                            && maxNegative != 0){
+                        if(lastHR < maxNegative){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+                    if(positiveValues.size()!=0
+                        && minPositive !=10000){
+                        if(lastHR > minPositive){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+
+
+                }else if(initialState.equals("positive")){
+                    if (positiveValues.size() != queueSize) {
+                        positiveValues.add(lastHR);
+                    } else {
+                        positiveValues.removeFirst();
+                        positiveValues.add(lastHR);
+                    }
+
+                    //Consider neutral !
+                    if(neutralValues.size()!= 0
+                            && minNeutral!=10000){
+                        if(lastHR > minNeutral){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+
+                }
+
+
+                if(negativeValues.size()!= 0){
+                    maxNegative = getMaxValueFromArray(negativeValues);
+                    minNegative = getMinValueFromArray(negativeValues);
+                }
+                if(neutralValues.size() != 0){
+                    maxNeutral = getMaxValueFromArray(neutralValues);
+                    minNeutral = getMinValueFromArray(neutralValues);
+
+                    //Make Average
+                    maxNeutralSum += maxNeutral;
+                    minNeutralSum += minNeutral;
+
+                    maxNeutralCount++;
+                    minNeutralCount++;
+
+                    maxNeutralAverage = maxNeutralSum / maxNeutralCount;
+                    minNeutralAverage = minNeutralSum / minNeutralCount;
+
+
+                }
+                if(positiveValues.size() !=0){
+                    maxPositive = getMaxValueFromArray(positiveValues);
+                    minPositive = getMinValueFromArray(positiveValues);
+                }
+
+                //if initial data finish
             }else{
-                state = "neutral";
+
+                if(lastHR > maxNeutral
+                        && lastHR > minNegative){
+                    state = "negative";
+                }else if( lastHR < minNeutral
+                        && lastHR < maxPositive){
+                    state = "positive";
+                }else{
+                    state = "neutral";
+                }
+
+                if(state.equals("negative")) {
+                    if (negativeValues.size() != queueSize) {
+                        negativeValues.add(lastHR);
+                    } else {
+                        negativeValues.removeFirst();
+                        negativeValues.add(lastHR);
+                    }
+
+                    //Consider neutral !
+                    if(neutralValues.size()!= 0
+                            && maxNeutral!=0){
+                        if(lastHR < maxNeutral){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+
+
+                }else if(state.equals("neutral")){
+
+                    if(negativeValues.size()!=0
+                            && maxNegative != 0){
+                        if(lastHR < maxNegative){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+                    if(positiveValues.size()!=0
+                            && minPositive !=10000){
+                        if(lastHR > minPositive){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+
+                }else if(state.equals("positive")){
+                    if (positiveValues.size() != queueSize) {
+                        positiveValues.add(lastHR);
+                    } else {
+                        positiveValues.removeFirst();
+                        positiveValues.add(lastHR);
+                    }
+
+                    //Consider neutral !
+                    if(neutralValues.size()!= 0
+                            && minNeutral!=10000){
+                        if(lastHR > minNeutral){
+                            if (neutralValues.size() != queueSize) {
+                                neutralValues.add(lastHR);
+                            } else {
+                                neutralValues.removeFirst();
+                                neutralValues.add(lastHR);
+                            }
+                        }
+                    }
+                }
+
+                if(negativeValues.size()!= 0){
+                    maxNegative = getMaxValueFromArray(negativeValues);
+                    minNegative = getMinValueFromArray(negativeValues);
+                }
+
+                if(neutralValues.size() != 0){
+                    maxNeutral = getMaxValueFromArray(neutralValues);
+                    minNeutral = getMinValueFromArray(neutralValues);
+
+                    //Make Average
+                    maxNeutralSum += maxNeutral;
+                    minNeutralSum += minNeutral;
+
+                    maxNeutralCount++;
+                    minNeutralCount++;
+
+                    maxNeutralAverage = maxNeutralSum / maxNeutralCount;
+                    minNeutralAverage = minNeutralSum / minNeutralCount;
+
+                }
+
+                if(positiveValues.size() !=0){
+                    maxPositive = getMaxValueFromArray(positiveValues);
+                    minPositive = getMinValueFromArray(positiveValues);
+                }
+
+
+
             }
+
+
+
+
+
+
+//            //Set preState
+//            if(preState.equals("unavailable")){//
+//                state = "neutral";
+//                preState = "neutral";
+//            //Use preState
+//            }else{
+//                changeState = getChangeState(averageHRList);
+//
+//                //Pre is neutral
+//                if(preState.equals("neutral")){
+//
+//                    if(changeState.equals("upper")){
+//                        if(lastHR > maxHR_F){
+//                            state = "negative";
+//                            preState = "neutral";
+//                        }else{
+//                            if(lastHR > averageHR_F){
+//                                state = "negative";
+//                                preState = "neutral";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "neutral";
+//                            }
+//                        }
+//                    }else if(changeState.equals("middle")){
+//                        if(lastHR < maxHR_F
+//                                && lastHR > minHR_F){
+//                            state ="neutral";
+//                            preState = "neutral";
+//                        }else{
+//                            if(lastHR > maxHR_F){
+//                                state = "negative";
+//                                preState = "neutral";
+//                            }else if(lastHR > averageHR_F){
+//                                state = "negative";
+//                                preState = "neutral";
+//                            }else if(lastHR < minHR_F){
+//                                state = "positive";
+//                                preState = "neutral";
+//                            }else if(lastHR < averageHR_F){
+//                                state = "positive";
+//                                preState = "neutral";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "neutral";
+//                            }
+//                        }
+//                    }else if(changeState.equals("lower")){
+//                        if(lastHR < minHR_F){
+//                            state = "positive";
+//                            preState = "neutral";
+//                        }else{
+//                            if(lastHR < averageHR_F){
+//                                state = "positive";
+//                                preState = "neutral";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "neutral";
+//                            }
+//                        }
+//                    }else{
+//                        Log.i(Const.TAG, "Error state");
+//                    }
+//                //pre is negative
+//                }else if(preState.equals("negative")){
+//
+//                    if(changeState.equals("upper")){
+//                        if(lastHR < minHR_F){
+//                            if(lastHR >= averageHR_F){
+//                                state = "negative";
+//                                preState = "negative";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "negative";
+//                            }
+//                        }else{
+//                            state = "negative";
+//                            preState = "negative";
+//                        }
+//                    }else if(changeState.equals("middle")){
+//                        if(lastHR < minHR_F){
+//                            if(lastHR > averageHR_F){
+//                                state = "negative";
+//                                preState = "negative";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "negative";
+//                            }
+//                        }else{
+//                            state = "negative";
+//                            preState = "negative";
+//                        }
+//                    }else if(changeState.equals("lower")){
+//                        if(lastHR < minHR_F){
+//                            if(lastHR > averageHR_F){
+//                                state = "negative";
+//                                preState = "negative";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "negative";
+//                            }
+//                        }else{
+//                            state = "negative";
+//                            preState = "negative";
+//                        }
+//                    }else{
+//                        Log.i(Const.TAG, "Error state");
+//                    }
+//                //pre is positive
+//                }else if(preState.equals("positive")){
+//
+//                    if(changeState.equals("upper")){
+//                        if(lastHR > maxHR_F){
+//                            if(lastHR < averageHR_F){
+//                                state = "positive";
+//                                preState = "positive";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "positive";
+//                            }
+//                        }else{
+//                            state = "positive";
+//                            preState = "positive";
+//                        }
+//                    }else if(changeState.equals("middle")){
+//                        if(lastHR > maxHR_F){
+//                            if(lastHR < averageHR_F){
+//                                state = "positive";
+//                                preState = "neutral";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "positive";
+//                            }
+//                        }else{
+//                            state = "positive";
+//                            preState = "positive";
+//                        }
+//                    }else if(changeState.equals("lower")){
+//                        if(lastHR > maxHR_F){
+//                            if(lastHR < averageHR_F){
+//                                state = "positive";
+//                                preState = "positive";
+//                            }else{
+//                                state = "neutral";
+//                                preState = "positive";
+//                            }
+//                        }else{
+//                            state = "positive";
+//                            preState = "positive";
+//                        }
+//                    }else{
+//                        Log.i(Const.TAG, "Error state");
+//                    }
+//
+//                }else{
+//                    Log.i(Const.TAG, "Error state");
+//                }
+//
+//            }
         }
 
+        //            if(lastHR > )
+
+
+//            //upper state
+//            if(maxHR_F < maxHR_L
+//                && maxHR_F < lastHR) {
+//                state = "negative";
+//            //down state
+//            }else if(minHR_F > minHR_L
+//                    && minHR_F > lastHR){
+//                state = "positive";
+//            }else{
+//                state= "neutral";
+//            }
+
+//            if(maxHR_1 < lastHR && maxHR_2 < lastHR){
+//                state = "negative";
+//            }else if( minHR_1 > lastHR && minHR_2 > lastHR){
+//                state = "positive";
+//            }else{
+//                state = "neutral";
+//            }
+
         return state;
+
     }
+
+    public float getMaxValueFromArray(LinkedList<Float> data){
+        float max = 0;
+        for(int i = 0; i < data.size(); i++){
+            if(max < data.get(i)){
+                max = data.get(i);
+            }
+        }
+        return max;
+    }
+    public float getMinValueFromArray(LinkedList<Float> data) {
+        float min = 10000;
+        for(int i = 0; i< data.size(); i++){
+            if(min > data.get(i)){
+                min = data.get(i);
+            }
+        }
+        return min;
+    }
+
+
 
     public String getAvailableFlag(){
         return availableFlag;
