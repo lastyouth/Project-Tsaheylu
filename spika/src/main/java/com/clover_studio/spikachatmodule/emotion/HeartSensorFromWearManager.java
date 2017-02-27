@@ -91,6 +91,17 @@ public class HeartSensorFromWearManager {
     public float maxNeutralAverage;
     public float minNeutralAverage;
 
+    //JesungKim 20170223
+    public static float avgHRValue = -1;
+    public static float sumHRValue = -1;
+    public static float prevHRValue = -1;
+    public static float avgHRCnt = -1;
+    public static final float STATE_CHANGE_VALUE = 3;
+    public static int incCnt = -1;
+    public static int decCnt = -1;
+    public static String emotionState = "neutral";
+    public static final int STATE_CHANGE_COUNTER = 3;
+
 
 
     public void addSensorDataToQueue(float[] hr, long timestamp, int accuracy)
@@ -435,6 +446,13 @@ public class HeartSensorFromWearManager {
         return state;
     }
 
+    //public static float prevHRValue = -1;
+    //public static int incCnt = -1;
+    //public static int decCnt = -1;
+    //public static String emotionState = "neutral";
+    //public static final int STATE_CHANGE_COUNTER = 3;
+
+
     // mckang
     // State is four (unavailable, positive, neutral, and negative),
     public String getCurrentState(){
@@ -453,6 +471,64 @@ public class HeartSensorFromWearManager {
 
         String initialState = new String();
 
+        lastHR = mHRList.getLast().heartrate;
+
+        //JesungKim 20170222
+        Log.e(Const.TAG,"JesungKim --  HR Score: (" + lastHR + ")");
+        if (prevHRValue == -1) {
+            prevHRValue = lastHR;
+            incCnt = 0;
+            decCnt = 0;
+            avgHRCnt = 0;
+            avgHRValue = 0;
+            sumHRValue = 0;
+            state = emotionState;
+        }
+        else {
+
+            avgHRCnt++;
+            sumHRValue = sumHRValue + lastHR;
+            avgHRValue = sumHRValue/avgHRCnt;
+            Log.e(Const.TAG,"JesungKim --  AVG HR Score: (" + avgHRValue + ")");
+
+            if ( (lastHR-avgHRValue) >= STATE_CHANGE_VALUE) {
+                state = "negative";
+            }
+
+            else {
+                state = "neutral";
+            }
+
+            /*
+            if (prevHRValue < lastHR) {
+                incCnt++;
+                decCnt = 0;
+            }
+            else if (prevHRValue > lastHR) {
+                decCnt++;
+                incCnt = 0;
+            }
+
+            if (incCnt >= STATE_CHANGE_COUNTER){
+                state = "negative";
+                emotionState = "negative";
+            }
+            else if (decCnt >= STATE_CHANGE_COUNTER){
+                state = "neutral";
+                emotionState = "neutral";
+            }
+            else {
+                state = emotionState;
+            }
+            */
+
+        }
+
+        //state = "negative";
+        //state = "positive";
+        //state = "neutral";
+
+        /*
 //      if(maxOfAverageHRList.size() != 0 && minOfAverageHRList.size() != 0){
         if(maxOfAverageHRList.size() != 0 && minOfAverageHRList.size() != 0
                 && maxOfAverageHRList.size() == queueSize && minOfAverageHRList.size() == queueSize){
@@ -692,6 +768,7 @@ public class HeartSensorFromWearManager {
 
 
 
+
 //            //Set preState
 //            if(preState.equals("unavailable")){//
 //                state = "neutral";
@@ -875,6 +952,10 @@ public class HeartSensorFromWearManager {
 //            }else{
 //                state = "neutral";
 //            }
+
+*/
+
+
 
         return state;
 

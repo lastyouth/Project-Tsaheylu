@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Project-Tsaheylu.iml" filepath="$PROJECT_DIR$/Project-Tsaheylu.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Tsahelu.iml" filepath="$PROJECT_DIR$/Tsahelu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Tsaheylu.iml" filepath="$PROJECT_DIR$/Tsaheylu.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/spika/spika.iml" filepath="$PROJECT_DIR$/spika/spika.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
