@@ -346,8 +346,12 @@ public class ChatActivity extends BaseActivity {
                         */
 
                         //JesungKim 20170223 - Revised Recognition Mechanism
-                        String currentState = msr.getCurrentState();    //Get HR Result First
+//                        String currentState = msr.getCurrentState();    //Get HR Result First
+
+                        String currentState = mHSManager.getCurrentState();    //Get HR Result First
                         Log.i(Const.TAG,"Current State : " + currentState);
+
+                        Log.e(Const.TAG,"JesungKim -- HR QUEUE : "+ mHSManager.getHeartDate().getHR());
 
                         if (currentState.equals("positive")) {
                             Log.e(Const.TAG,"JesungKim -- HR: (" + currentState + ")");
@@ -798,7 +802,8 @@ public class ChatActivity extends BaseActivity {
                         if(isExperiment==true) {
 
                             //For Log data log
-                            mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, msr);
+//                            mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, msr);
+                            mLogManager.writeRawData(finalResult,preEmotion, RelativeEmotion, AbsoluteEmotion, m, mHSManager);
                             if(currentState.equals("positive")){
                                 positiveHRCount++;
                             }else if(currentState.equals("negative")){
@@ -1060,12 +1065,14 @@ public class ChatActivity extends BaseActivity {
         FacialEmotionManager.getInstance().initializeFacialManager(mFEMListener);
 
         // initialize HeartSensorManager
-//        mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
-        //mHSManager.checkBluetooth();
+        //mckang modify
+        mHSManager = new HeartSensorManager(this,Const.Emotion.MAX_QUEUED_DATA_FOR_HRV);
+        mHSManager.checkBluetooth();
 
         // initialize HeartSensorFromWearManager
-        msr = HeartSensorFromWearManager.getInstance(this);
-        msr.startMeasurement();
+        //mckang modify
+//        msr = HeartSensorFromWearManager.getInstance(this);
+//        msr.startMeasurement();
 
         // initialize EffectManager
         Point displaySize = new Point();
@@ -1139,11 +1146,12 @@ public class ChatActivity extends BaseActivity {
         {
             FacialEmotionManager.getInstance().releaseFacialManager();
         }
-        //mHSManager.disconnect();
+        //mckang modify
+        mHSManager.disconnect();
         // stop service
-        HeartSensorFromWearManager msr = HeartSensorFromWearManager.getInstance(this);
-
-        msr.stopMeasurement();
+//        HeartSensorFromWearManager msr = HeartSensorFromWearManager.getInstance(this);
+//
+//        msr.stopMeasurement();
 
         super.onDestroy();
     }
@@ -1206,7 +1214,7 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                  mHSManager.clearQueue();
+                   mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Happiness) End",Toast.LENGTH_SHORT).show();
@@ -1236,7 +1244,7 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                    mHSManager.clearQueue();
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Anger) End",Toast.LENGTH_SHORT).show();
@@ -1244,6 +1252,12 @@ public class ChatActivity extends BaseActivity {
 
                     mLogManager.writeExperimentLog("Anger","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
+                    //mckang for log
+                    String content = "HR results --- Positive : "+ positiveHRCount + " Negative : "+ negativeHRCount+ " Neutral : " + neutralHRCount+"\n";
+                    mLogManager.writeLog(content);
+                    positiveHRCount = 0;
+                    negativeHRCount = 0;
+                    neutralHRCount = 0;
 
                 }
 
@@ -1262,7 +1276,7 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                    mHSManager.clearQueue();
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Surprise) End",Toast.LENGTH_SHORT).show();
@@ -1270,6 +1284,12 @@ public class ChatActivity extends BaseActivity {
 
                     mLogManager.writeExperimentLog("Surprise","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
+                    //mckang for log
+                    String content = "HR results --- Positive : "+ positiveHRCount + " Negative : "+ negativeHRCount+ " Neutral : " + neutralHRCount+"\n";
+                    mLogManager.writeLog(content);
+                    positiveHRCount = 0;
+                    negativeHRCount = 0;
+                    neutralHRCount = 0;
                 }
 
             }else if(position ==4){
@@ -1286,7 +1306,7 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                    mHSManager.clearQueue();
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Sadness) End",Toast.LENGTH_SHORT).show();
@@ -1294,6 +1314,12 @@ public class ChatActivity extends BaseActivity {
 
                     mLogManager.writeExperimentLog("Sadness","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
+                    //mckang for log
+                    String content = "HR results --- Positive : "+ positiveHRCount + " Negative : "+ negativeHRCount+ " Neutral : " + neutralHRCount+"\n";
+                    mLogManager.writeLog(content);
+                    positiveHRCount = 0;
+                    negativeHRCount = 0;
+                    neutralHRCount = 0;
                 }
 
             }else if(position == 5){
@@ -1310,7 +1336,7 @@ public class ChatActivity extends BaseActivity {
                     sadnessCount = 0;
                     neutralCount = 0;
 
-//                    mHSManager.clearQueue();
+                    mHSManager.clearQueue();
 
                 }else{
                     Toast.makeText(getApplicationContext(),"Experiment (Neutral) End",Toast.LENGTH_SHORT).show();
@@ -1319,6 +1345,12 @@ public class ChatActivity extends BaseActivity {
                     mLogManager.writeExperimentLog("Neutral","End", happinessCount, angerCount, surpriseCount,sadnessCount,neutralCount);
 
 
+                    //mckang for log
+                    String content = "HR results --- Positive : "+ positiveHRCount + " Negative : "+ negativeHRCount+ " Neutral : " + neutralHRCount+"\n";
+                    mLogManager.writeLog(content);
+                    positiveHRCount = 0;
+                    negativeHRCount = 0;
+                    neutralHRCount = 0;
                 }
             }else if(position == 6) {
                 Toast.makeText(getApplicationContext(),"잠시만 기다리세요. 곧 시작합니다.",Toast.LENGTH_SHORT).show();

@@ -41,8 +41,7 @@ public class HeartSensorFromWearManager {
         public float heartrate;
     }
 
-//    private Queue<HeartSensorDataFromWear> mHRQueue;
-    //mckang
+//    private Queue<HeartSensorDataFromWear> mHRQueue;o
     private String availableFlag;
     private LinkedList<HeartSensorDataFromWear> mHRList;
     //Queue Size

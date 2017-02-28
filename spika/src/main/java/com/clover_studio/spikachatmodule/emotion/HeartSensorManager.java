@@ -881,6 +881,59 @@ public class HeartSensorManager {
         return tempString;
     }
 
+    public String getCurrentState(){
+        String currentState = "unavailable";
+
+        calculateAverage();
+        calculateAverageOfAverageAndMinMax();
+        calucateOverallAverage();
+
+        LinkedList<Float> tempAverageHR = new LinkedList<Float>(getHeartDate().getAverageHR());
+        LinkedList<Integer> tempMinHR = new LinkedList<Integer>(getHeartDate().getMinHR());
+        LinkedList<Integer> tempMaxHR = new LinkedList<Integer>(getHeartDate().getMaxHR());
+
+        LinkedList<Float> tempAverageOfAverageHR = new LinkedList<Float>(getHeartDate().getAverageOfAverageHR());
+
+        LinkedList<Float> tempMaxOfAverageHR = new LinkedList<Float>(getHeartDate().getMaxOfAverageHR());
+        LinkedList<Integer> tempHR = new LinkedList<Integer>(getHeartDate().getHR());
+
+//        if (tempMaxOfAverageHR.size() != 0) {
+//            if (preEmotionResult.equals("happiness") || preEmotionResult.equals("surprise")) {
+//                btnEmotion.setImageResource(R.drawable.ic_shy);
+//                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//                finalResult = "neutral";
+//            } else if (tempHR.getLast() > tempMaxOfAverageHR.getFirst()) {
+//                btnEmotion.setImageResource(R.drawable.ic_angry);
+//                classifiedemotion = Const.Emotion.EMOTION_ANGRY;
+//                finalResult = "angry";
+//            } else {
+//                btnEmotion.setImageResource(R.drawable.ic_shy);
+//                classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//                finalResult = "neutral";
+//            }
+//        } else {
+//            btnEmotion.setImageResource(R.drawable.ic_shy);
+//            classifiedemotion = Const.Emotion.EMOTION_NEUTRAL;
+//            finalResult = "neutral";
+//        }
+
+        if (tempMaxOfAverageHR.size() != 0) {
+          if (tempHR.getLast() > tempMaxOfAverageHR.getFirst()) {
+                currentState = "negative";
+            } else {
+                currentState = "neutral";
+            }
+        } else {
+            currentState = "unavailable";
+        }
+
+
+        return currentState;
+    }
+
+
+
+
     public float getOverallAverageHR(){ return overallAverageHR;}
 
     public float getOverallAverageHRV(){ return overallAverageHRV; }
