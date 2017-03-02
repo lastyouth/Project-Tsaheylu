@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.clover_studio.spikachatmodule.emotion.HeartSensorFromWearManager;
+import com.clover_studio.spikachatmodule.emotion.HeartSensorManager;
 import com.clover_studio.spikachatmodule.models.FacialEmotionModel;
 
 import java.io.File;
@@ -229,43 +230,87 @@ public class LogManager {
 
     }
 
-    public void writeRawData(String finalResult, String preEmotionResult, String RelativeEmotion, String AbsoluteEmotion,FacialEmotionModel m, HeartSensorFromWearManager msr){
-            String content = new String();
-            Calendar time = Calendar.getInstance();
-            long now = time.getTimeInMillis();
-            content = time.getTime().toString() + " available : "+ msr.getAvailableFlag()+ "\n";
-            writeLog(content);
-            content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
-            writeLog(content);
-            content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
-                    " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
-            writeLog(content);
-            content = "Current State (HR) : " + msr.getCurrentState() +"\n";
-            writeLog(content);
-            content = "All Average (HR) : " + msr.allAverage + " All Max (HR) : " + msr.allMax + " All Min (HR) : " +msr.allMin + "\n";
-            writeLog(content);
-            content = "Queue HR : " + msr.getHRList() +"\n";
-            writeLog(content);
-            content = "Average HR : " + msr.getAverageHRList() +"\n";
-            writeLog(content);
-            content = "Max of average HR : " + msr.getMaxOfAverageHRList() + "\n";
-            writeLog(content);
-            content = "Min of average HR : " + msr.getMinOfAverageHRList() + "\n";
-            writeLog(content);
-            content = "Max neutral average HR : " + msr.maxNeutralAverage + " Min neutral average HR : " + msr.minNeutralAverage+"\n";
-            writeLog(content);
-            content = "Negative Values HR : " + msr.negativeValues + "\n";
-            writeLog(content);
-            content = "Max negative HR : "+ msr.maxNegative + " Min negative HR : "+ msr.minNegative+"\n";
-            writeLog(content);
-            content = "Neutral Values HR : "+ msr.neutralValues + "\n";
-            writeLog(content);
-            content = "Max neutral HR : "+ msr.maxNeutral + " Min neutral HR : "+ msr.minNeutral+"\n";
-            writeLog(content);
-            content = "Positive Values HR : "+ msr.positiveValues + "\n";
-            writeLog(content);
-            content = "Max positive HR : "+ msr.maxPositive + " Min positive HR : "+ msr.minPositive+"\n\n";
-            writeLog(content);
+    //Prev log
+
+//    public void writeRawData(String finalResult, String preEmotionResult, String RelativeEmotion, String AbsoluteEmotion,FacialEmotionModel m, HeartSensorFromWearManager msr){
+//            String content = new String();
+//            Calendar time = Calendar.getInstance();
+//            long now = time.getTimeInMillis();
+//            content = time.getTime().toString() + " available : "+ msr.getAvailableFlag()+ "\n";
+//            writeLog(content);
+//            content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+//            writeLog(content);
+//            content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
+//                    " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
+//            writeLog(content);
+//            content = "Current State (HR) : " + msr.getCurrentState() +"\n";
+//            writeLog(content);
+//            content = "All Average (HR) : " + msr.allAverage + " All Max (HR) : " + msr.allMax + " All Min (HR) : " +msr.allMin + "\n";
+//            writeLog(content);
+//            content = "Queue HR : " + msr.getHRList() +"\n";
+//            writeLog(content);
+//            content = "Average HR : " + msr.getAverageHRList() +"\n";
+//            writeLog(content);
+//            content = "Max of average HR : " + msr.getMaxOfAverageHRList() + "\n";
+//            writeLog(content);
+//            content = "Min of average HR : " + msr.getMinOfAverageHRList() + "\n";
+//            writeLog(content);
+//            content = "Max neutral average HR : " + msr.maxNeutralAverage + " Min neutral average HR : " + msr.minNeutralAverage+"\n";
+//            writeLog(content);
+//            content = "Negative Values HR : " + msr.negativeValues + "\n";
+//            writeLog(content);
+//            content = "Max negative HR : "+ msr.maxNegative + " Min negative HR : "+ msr.minNegative+"\n";
+//            writeLog(content);
+//            content = "Neutral Values HR : "+ msr.neutralValues + "\n";
+//            writeLog(content);
+//            content = "Max neutral HR : "+ msr.maxNeutral + " Min neutral HR : "+ msr.minNeutral+"\n";
+//            writeLog(content);
+//            content = "Positive Values HR : "+ msr.positiveValues + "\n";
+//            writeLog(content);
+//            content = "Max positive HR : "+ msr.maxPositive + " Min positive HR : "+ msr.minPositive+"\n\n";
+//            writeLog(content);
+//
+//
+//    }
+
+    public void writeRawData(String finalResult, String preEmotionResult, String RelativeEmotion, String AbsoluteEmotion,FacialEmotionModel m, HeartSensorManager mHSManager ){
+        String content = new String();
+        Calendar time = Calendar.getInstance();
+        long now = time.getTimeInMillis();
+//        content = time.getTime().toString() + " available : "+ mHSManager.get.getAvailableFlag()+ "\n";
+//        writeLog(content);
+        content = "Final Result : " + finalResult + " Pre Result : " + preEmotionResult + " Relative Result : " + RelativeEmotion + " Absolute Result : " + AbsoluteEmotion + "\n";
+        writeLog(content);
+        content = "Happiness : " + m.getScores().getHappiness() + " Surprise : " + m.getScores().getSurprise() +
+                " Angry : " + m.getScores().getAnger() + " Sadness " + m.getScores().getSadness() + " Neutral : " + m.getScores().getNeutral() + "\n";
+        writeLog(content);
+        content = "Current State (HR) : " + mHSManager.getCurrentState() +"\n";
+        writeLog(content);
+//        content = "All Average (HR) : " + mHSManager.getHeartDate().get getOverallAverageHR()+"\n";
+//                .allAverage + " All Max (HR) : " + msr.allMax + " All Min (HR) : " +msr.allMin + "\n";
+//        writeLog(content);
+        content = "Queue HR : " + mHSManager.getHeartDate().getHR() +"\n";
+        writeLog(content);
+        content = "Average HR : " + mHSManager.getHeartDate().getAverageHR() +"\n";
+        writeLog(content);
+        content = "Max of average HR : " + mHSManager.getHeartDate().getMaxHR() + "\n";
+        writeLog(content);
+        content = "Min of average HR : " + mHSManager.getHeartDate().getMinHR() + "\n";
+        writeLog(content);
+//        content = "Max neutral average HR : " + msr.maxNeutralAverage + " Min neutral average HR : " + msr.minNeutralAverage+"\n";
+//        writeLog(content);
+//        content = "Negative Values HR : " + msr.negativeValues + "\n";
+//        writeLog(content);
+//        content = "Max negative HR : "+ msr.maxNegative + " Min negative HR : "+ msr.minNegative+"\n";
+//        writeLog(content);
+//        content = "Neutral Values HR : "+ msr.neutralValues + "\n";
+//        writeLog(content);
+//        content = "Max neutral HR : "+ msr.maxNeutral + " Min neutral HR : "+ msr.minNeutral+"\n";
+//        writeLog(content);
+//        content = "Positive Values HR : "+ msr.positiveValues + "\n";
+//        writeLog(content);
+//        content = "Max positive HR : "+ msr.maxPositive + " Min positive HR : "+ msr.minPositive+"\n\n";
+//        writeLog(content);
 
 
     }
