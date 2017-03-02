@@ -45,7 +45,7 @@ public class PerformanceCheckManager {
             if (n < 0) {
                 n *= -1;
             }
-            emotion = n % 4;
+            emotion = n % 5;
         }
         else
         {
@@ -64,6 +64,11 @@ public class PerformanceCheckManager {
         {
             mSelectedEmotion = "놀람";
         }
+        else if(emotion == 4)
+        {
+            mSelectedEmotion = "중립";
+        }
+
         mStartTime = System.currentTimeMillis();
         mCallback.checkStart(mSelectedEmotion);
     }

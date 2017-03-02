@@ -471,7 +471,12 @@ public class HeartSensorFromWearManager {
 
         String initialState = new String();
 
-        lastHR = mHRList.getLast().heartrate;
+        try {
+            lastHR = mHRList.getLast().heartrate;
+        }catch(Exception e)
+        {
+            lastHR = 0.0f;
+        }
 
         //JesungKim 20170222
         Log.e(Const.TAG,"JesungKim --  HR Score: (" + lastHR + ")");

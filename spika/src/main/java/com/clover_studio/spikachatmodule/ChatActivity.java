@@ -1961,6 +1961,9 @@ public class ChatActivity extends BaseActivity {
                         } else if (message.message.equals("0x03start")) {
                             Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
                             mPCManager = new PerformanceCheckManager(mPCMListener, 3);
+                        } else if( message.message.equals("0x04start")){
+                            Toast.makeText(getApplicationContext(), "잠시만 기다리세요. 곧 시작합니다.", Toast.LENGTH_SHORT).show();
+                            mPCManager = new PerformanceCheckManager(mPCMListener, 4);
                         }
                     }
                     boolean toScrollBottom = false;
